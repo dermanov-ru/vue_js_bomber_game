@@ -1,0 +1,100 @@
+.bomber_game[v-cloak] > * {
+    display: none;
+}
+
+.bomber_game[v-cloak]::before {
+    content: " ";
+    display: block;
+    width: 100%;
+    height: 16px;
+    background: no-repeat center url('data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==');
+    padding-top: 50px;
+}
+
+.bomber_game a {
+    font-size: 14px;
+}
+
+.bomber_game .green {
+    color: #28ad62;
+}
+
+.bomber_game .orange {
+    color: #e88f41 ;
+}
+
+.bomber_game {
+    text-align: center;
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+.minesweeper_table {
+    display: inline-block;
+    padding: 10px 0;
+}
+
+.minesweeper_row {
+    clear: both;
+}
+
+.bomber_game .cell {
+    width: 25px;
+    height: 25px;
+    border: 1px solid grey;
+    cursor: pointer;
+    margin: 1px;
+    font-size: 14px;
+    text-align: center;
+    line-height: 25px;
+    float: left;
+    font-weight: bold;
+}
+
+.bomber_game .cell.one {color: blue;}
+.bomber_game .cell.two {color: green;}
+.bomber_game .cell.three {color: darkgoldenrod;}
+.bomber_game .cell.four {color: palevioletred;}
+.bomber_game .cell.five {color: darkorchid;}
+.bomber_game .cell.six {color: steelblue;}
+.bomber_game .cell.seven {color: tomato;}
+.bomber_game .cell.eight {color: red;}
+
+.bomber_game .cell.closed {background: grey;}
+
+.bomber_game .cell.flag {
+    color: darkorange;
+    background: transparent;
+}
+.bomber_game .cell.flag i {
+    z-index: -1;
+    position: relative;
+}
+
+.bomber_game .cell.failed {
+    color: black;
+}
+
+.bomber_game .cell.mine {
+    color: red;
+    background: white;
+}
+
+.bomber_game .cell.open {
+    background: white;
+    cursor: default;
+}
+
+.minesweeper_status_bar {
+    text-align: center;
+    border: 1px dotted grey;
+    border-radius: 5px;
+    margin-bottom: 2px;
+    padding: 0 5px;
+}
+
+.minesweeper_status_bar_item {
+    display: inline-block;
+    padding: 10px 3px;
+    font-size: 15px;
+}

@@ -1,0 +1,67 @@
+# --- files ---
+.DS_Store
+Thumbs.db
+/nbproject/
+/.idea/
+/*.sublime-project
+/*.sublime-workspace
+
+# --- media files ---
+/upload
+/video
+/files
+
+# --- log files ---
+/_logs/
+*.log
+log.txt
+
+# --- archives ---
+*.tar*
+*.zip*
+*.rar*
+
+# --- mysql files ---
+/*.sql
+
+# --- other ---
+*.tmp
+/_*
+/test/
+/t.php
+test.php
+robots.txt
+sitemap*.xml
+/*.txt
+web.config
+.htaccess.restore
+*old*
+*/*cache*/
+
+cgi-bin/
+google*.html
+mywot*.html
+wmail*.html
+yandex*.html
+php.ini
+
+phpMyAdmin
+pma
+adminer.php
+adminer.css
+
+/webstat
+
+# allows fast hide any files or folders from under git's eyes
+*_gitignore_*
+
+# config
+/lib/conf/*
+
+# composer
+/vendor/
+
+#phinx
+phinx.yml
+
+/counters.php
