@@ -57,6 +57,8 @@ class Around {
 
 class Monster {
     constructor(cell) {
+        cell.is_monster = true;
+
         this.cell = cell;
     }
 
@@ -137,6 +139,7 @@ class Cell {
         this.$el = $(el);
         this.is_earth = false;
         this.is_wall = false;
+        this.is_monster = false;
         this.is_exit_door_open = false;
         this.is_contain_exit_door = false;
         this.around = null;
@@ -182,6 +185,10 @@ class Cell {
     isEnterableCell(){
         return !(this.is_wall || this.is_earth);
     }
+
+    isEmptyCell(){
+        return !(this.is_wall || this.is_earth || this.is_monster);
+    }
 }
 
 class BomberGame {
@@ -199,9 +206,9 @@ class BomberGame {
     initGame($cells){
         this.initCells($cells);
         this.initWalls();
-        this.initEarth();
         this.initHero();
         this.initMonsters();
+        this.initEarth();
         this.initExitDoor();
         // place power improver
 
@@ -267,7 +274,7 @@ class BomberGame {
         for (let i = 0 ; counter < earthCount && i < this.cells.length  ; i++){
             let cell = randomCells[ i ];
 
-            if (cell.is_wall || cell.is_earth)
+            if (!cell.isEmptyCell())
                 continue;
 
             cell.is_earth = true;
@@ -284,7 +291,7 @@ class BomberGame {
             if (spawnedMonsterCount == monsterCount)
                 break;
 
-            if (cell.is_wall)
+            if (!cell.isEmptyCell())
                 continue;
 
             if (this.hero.cell.around.getAllAroundCells().indexOf(cell) > -1)
