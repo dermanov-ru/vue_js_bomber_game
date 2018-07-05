@@ -33,6 +33,14 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/functions.php";
                 <div class="bomber_game_status_bar_item" title="">Игра «Бомбер»</div>
             </div>
 
+            <div class="bomber_game_status_bar" >
+                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_left" >Go Left</a>
+                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_right" >Go Right</a>
+                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_top" >Go Top</a>
+                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_bottom" >Go Bottom</a>
+                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="place_bomb" >Place bomb</a>
+            </div>
+
             <div class="bomber_game_table">
                 <template  v-for="bomber_game_status_bar_item in bomber_game.game_field_size">
                     <div class="bomber_game_row">

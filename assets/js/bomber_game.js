@@ -30,6 +30,26 @@ class Hero {
         this.cell.$el.addClass("hero");
         this.cell.$el.html('<i class="fas fa-user-astronaut"></i>');
     }
+
+    move_left(){
+        console.log("Hero move_left");
+    }
+
+    move_right(){
+        console.log("Hero move_right");
+    }
+
+    move_top(){
+        console.log("Hero move_top");
+    }
+
+    move_bottom(){
+        console.log("Hero move_bottom");
+    }
+
+    place_bomb(){
+        console.log("Hero place_bomb");
+    }
 }
 
 class Cell {
@@ -78,6 +98,10 @@ class BomberGame {
         // place power improver
 
         this.renderGame();
+    }
+
+    getHero(){
+        return this.hero;
     }
 
 

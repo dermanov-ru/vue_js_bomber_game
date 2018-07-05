@@ -19,6 +19,24 @@ new Vue({
         console.log('this.bomber_game', this.bomber_game);
     },
     methods : {
+        move_left : function () {
+            this.bomber_game.getHero().move_left();
+        },
 
+        move_right : function () {
+            this.bomber_game.getHero().move_right();
+        },
+
+        move_top : function () {
+            this.bomber_game.getHero().move_top();
+        },
+
+        move_bottom : function () {
+            this.bomber_game.getHero().move_bottom();
+        },
+
+        place_bomb : function () {
+            this.bomber_game.getHero().place_bomb();
+        }
     },
 });
