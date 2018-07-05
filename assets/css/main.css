@@ -78,6 +78,10 @@
     color: red;
 }
 
+.bomber_game .cell.earth {
+    background: burlywood;
+}
+
 .bomber_game .cell.wall {
     background: grey;
 }

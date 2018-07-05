@@ -142,6 +142,7 @@ class Hero {
 class Cell {
     constructor(el) {
         this.$el = $(el);
+        this.is_earth = false;
         this.is_wall = false;
         this.is_exit_door_open = false;
         this.is_contain_exit_door = false;
@@ -152,8 +153,13 @@ class Cell {
         this.$el.attr("class", "cell");
         this.$el.html("");
 
-        if (this.is_wall)
+        if (this.is_wall) {
             this.$el.addClass("wall");
+            return;
+        }
+
+        if (this.is_earth)
+            this.$el.addClass("earth");
 
         else if (this.is_contain_exit_door) {
             this.$el.addClass("exit_door");
@@ -196,6 +202,7 @@ class BomberGame {
     initGame($cells){
         this.initCells($cells);
         this.initWalls();
+        this.initEarth();
         this.initHero();
         this.initMonsters();
         this.initExitDoor();
@@ -250,6 +257,22 @@ class BomberGame {
         }
     }
 
+    initEarth(){
+        let earthCount = this.cells.length / 5;
+        let counter = 0;
+        let randomCells = Tools.shuffle( this.cells.slice(1) );
+
+        for (let i = 0 ; counter < earthCount && i < this.cells.length  ; i++){
+            let cell = randomCells[ i ];
+
+            if (cell.is_wall || cell.is_earth)
+                continue;
+
+            cell.is_earth = true;
+            counter++;
+        }
+    }
+
     initMonsters(){
         let monsterCount = this.monster_count;
         let spawnedMonsterCount = 0;
@@ -265,8 +288,16 @@ class BomberGame {
             if (this.hero.cell.around.getAllAroundCells().indexOf(cell) > -1)
                 continue;
 
-            let newMonster = new Monster(cell, this.cells);
+            let newMonster = new Monster(cell);
             this.monsters.push(newMonster);
+
+            for (let aroundCell of newMonster.cell.around.getAllAroundCells()){
+                if (!aroundCell)
+                    continue;
+
+                if (!aroundCell.is_wall)
+                    aroundCell.is_earth = true;
+            }
 
             spawnedMonsterCount++;
         }
