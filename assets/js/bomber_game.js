@@ -56,9 +56,8 @@ class Around {
 }
 
 class Monster {
-    constructor(cell, cells) {
+    constructor(cell) {
         this.cell = cell;
-        this.cells = cells;
     }
 
     render(){
