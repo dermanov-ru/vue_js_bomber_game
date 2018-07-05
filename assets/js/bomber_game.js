@@ -211,6 +211,7 @@ class Hero {
 
         this.bomb_count--;
 
+        this.cell.is_bomb = true;
         let bomb = new Bomb(this.cell, this.explode_power);
         bomb.render();
 
@@ -230,6 +231,7 @@ class Cell {
         this.is_exit_door_open = false;
         this.is_contain_exit_door = false;
         this.around = null;
+        this.is_bomb = false;
         this.is_exployed = false;
     }
 
@@ -281,7 +283,7 @@ class Cell {
     }
 
     isEnterableCell(){
-        return !(this.is_wall || this.is_earth);
+        return !(this.is_wall || this.is_earth || this.is_bomb);
     }
 
     isEmptyCell(){
@@ -295,6 +297,7 @@ class Cell {
         this.is_exployed = true;
         this.is_earth = false;
         this.is_monster = false;
+        this.is_bomb = false;
         this.render();
 
         let context = this;
