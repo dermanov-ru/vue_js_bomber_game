@@ -36,9 +36,8 @@ class Monster {
 }
 
 class Hero {
-    constructor(cell, cells) {
+    constructor(cell) {
         this.cell = cell;
-        this.cells = cells;
         this.explode_power = 1;
     }
 
@@ -195,7 +194,11 @@ class BomberGame {
     }
 
     initHero(){
-        this.hero = new Hero(this.cells[ 0 ], this.cells);
+        this.hero = new Hero(this.cells[ 0 ]);
+
+        // allow user to start game :)
+        this.hero.cell.getRightCell().is_wall = false;
+        this.hero.cell.getBottomCell().is_wall = false;
     }
 
     initWalls(){
