@@ -267,10 +267,18 @@ class BomberGame {
     }
 
     initExitDoor(){
-        let doorIndex = Tools.random(0, this.walls.length - 1);
+        let possibleDoorCells = this.cells.slice(this.cells.length / 3);
+        possibleDoorCells = Tools.shuffle(possibleDoorCells);
 
-        this.walls[ doorIndex ].is_contain_exit_door = true;
-        this.exit_door = this.walls[ doorIndex ];
+        for (let cell of possibleDoorCells){
+            if (!cell.is_wall)
+                continue
+
+            cell.is_contain_exit_door = true;
+            this.exit_door = cell;
+
+            break;
+        }
     }
 
     renderGame(){
