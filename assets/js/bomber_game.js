@@ -220,7 +220,7 @@ class BomberGame {
         this.exit_door = null;
         this.hero = null;
 
-        this.monster_count = 4; // TODO get from game level param
+        this.monster_count = game_field_size; // TODO get from game level param
         this.monsters = [];
     }
 
