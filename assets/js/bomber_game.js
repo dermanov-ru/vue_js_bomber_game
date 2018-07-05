@@ -80,56 +80,50 @@ class Hero {
     move_left(){
         let cell = this.cell.getLeftCell();
 
-        if (cell){
-            if (cell.is_wall){
-                console.log("Hero can't move_left - WALL");
-            } else {
-                this.cell.render();
-                this.cell = cell;
-                this.render();
-            }
+        if (!cell)
+            return;
+
+        if (cell.isEnterableCell()){
+            this.move_to_cell(cell)
         }
+    }
+
+    move_to_cell(cell){
+        this.cell.render();
+        this.cell = cell;
+        this.render();
     }
 
     move_right(){
         let cell = this.cell.getRightCell();
 
-        if (cell){
-            if (cell.is_wall){
-                console.log("Hero can't move_right - WALL");
-            } else {
-                this.cell.render();
-                this.cell = cell;
-                this.render();
-            }
+        if (!cell)
+            return;
+
+        if (cell.isEnterableCell()){
+            this.move_to_cell(cell)
         }
     }
 
     move_top(){
         let cell = this.cell.getTopCell();
 
-        if (cell){
-            if (cell.is_wall){
-                console.log("Hero can't move_top - WALL");
-            } else {
-                this.cell.render();
-                this.cell = cell;
-                this.render();
-            }
+        if (!cell)
+            return;
+
+        if (cell.isEnterableCell()){
+            this.move_to_cell(cell)
         }
     }
 
     move_bottom(){
         let cell = this.cell.getBottomCell();
 
-        if (cell){
-            if (cell.is_wall){
-                console.log("Hero can't move_bottom - WALL");
-            } else {
-                this.cell.render();
-                this.cell = cell;
-                this.render();
-            }
+        if (!cell)
+            return;
+
+        if (cell.isEnterableCell()){
+            this.move_to_cell(cell)
         }
     }
 
@@ -184,6 +178,10 @@ class Cell {
     getBottomCell(){
         return this.around.bottom_cell;
     }
+
+    isEnterableCell(){
+        return !(this.is_wall || this.is_earth);
+    }
 }
 
 class BomberGame {
@@ -234,9 +232,14 @@ class BomberGame {
     initHero(){
         this.hero = new Hero(this.cells[ 0 ]);
 
+        let rightCell = this.hero.cell.getRightCell();
+        let bottomCell = this.hero.cell.getBottomCell();
+
         // allow user to start game :)
-        this.hero.cell.getRightCell().is_wall = false;
-        this.hero.cell.getBottomCell().is_wall = false;
+        if (!rightCell.isEnterableCell() && !bottomCell.isEnterableCell()){
+            rightCell.is_earth = false;
+            bottomCell.is_earth = false;
+        }
     }
 
     initWalls(){
