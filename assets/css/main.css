@@ -78,6 +78,11 @@
     color: red;
 }
 
+.bomber_game .cell.explode {
+    color: red;
+    background: yellow;
+}
+
 .bomber_game .cell.earth {
     background: burlywood;
 }

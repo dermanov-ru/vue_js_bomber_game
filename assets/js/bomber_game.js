@@ -27,8 +27,12 @@ class Around {
         this.bottom_right_cell  = around_cells_matrix[ 7 ];
     }
 
-    getLinearAroundCells(){
+    getLinearAroundCells(depth){
         let result = [];
+
+        // for (let i = 0 ; i <result depth ; i++){
+        //     let left
+        // }
 
         result.push(this.left_cell);
         result.push(this.right_cell);
@@ -52,6 +56,55 @@ class Around {
         result.push(this.bottom_right_cell);
 
         return result;
+    }
+}
+
+class Bomb {
+    constructor(cell, power) {
+        this.cell = cell;
+        this.power = power;
+        this.timeout_seconds = 3;
+        this.intervelId = 0;
+    }
+
+    render(){
+        this.cell.$el.attr("class", "cell");
+
+        if (this.timeout_seconds)  {
+            this.cell.$el.addClass("bomb");
+            this.cell.$el.html('<i class="fas fa-bomb animated zoomIn">' + this.timeout_seconds + '</i>');
+        } else {
+            this.cell.$el.addClass("explode");
+            this.cell.$el.html('<i class="fas fa-certificate animated zoomIn"></i></i>');
+        }
+    }
+
+    startTimer(){
+        let context = this;
+
+        this.intervelId = setInterval(function () {
+            context.timeout_seconds--;
+            context.render();
+
+            if (!context.timeout_seconds){
+                clearInterval(context.intervelId);
+                context.explode();
+            }
+
+        }, 250 * this.timeout_seconds)
+    }
+
+    explode(){
+        this.cell.explode();
+
+        let linearCells = this.cell.around.getLinearAroundCells(this.power);
+
+        for (let cell of linearCells){
+            if (!cell)
+                continue;
+
+            cell.explode();
+        }
     }
 }
 
@@ -151,7 +204,9 @@ class Hero {
     }
 
     place_bomb(){
-        console.log("Hero place_bomb");
+        let bomb = new Bomb(this.cell, this.explode_power);
+        bomb.render();
+        bomb.startTimer();
     }
 }
 
@@ -164,11 +219,16 @@ class Cell {
         this.is_exit_door_open = false;
         this.is_contain_exit_door = false;
         this.around = null;
+        this.is_exployed = false;
+    }
+
+    clean(){
+        this.$el.attr("class", "cell");
+        this.$el.html("");
     }
 
     render(){
-        this.$el.attr("class", "cell");
-        this.$el.html("");
+        this.clean();
 
         if (this.is_wall) {
             this.$el.addClass("wall");
@@ -185,6 +245,12 @@ class Cell {
 
         if (this.is_exit_door_open)
             this.$el.html('<i class="fas fa-door-open"></i>');
+
+        if (this.is_exployed){
+            this.clean();
+            this.$el.addClass("explode");
+            this.$el.html('<i class="fas fa-certificate animated zoomIn"></i></i>');
+        }
     }
 
     getLeftCell(){
@@ -209,6 +275,22 @@ class Cell {
 
     isEmptyCell(){
         return !(this.is_wall || this.is_earth || this.is_monster);
+    }
+
+    explode(){
+        if (this.is_wall)
+            return;
+
+        this.is_exployed = true;
+        this.is_earth = false;
+        this.is_monster = false;
+        this.render();
+
+        let context = this;
+        setTimeout(function () {
+            context.is_exployed = false;
+            context.render();
+        }, 700); // TODO extract timeout to config
     }
 }
 
