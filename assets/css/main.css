@@ -64,3 +64,19 @@
     float: left;
     font-weight: bold;
 }
+
+.bomber_game .cell.hero {
+    background: red;
+}
+
+.bomber_game .cell.wall {
+    background: grey;
+}
+
+.bomber_game .cell.exit_door {
+    background: darkgreen;
+}
+
+.bomber_game .cell.exit_door.open {
+    background: greenyellow;
+}

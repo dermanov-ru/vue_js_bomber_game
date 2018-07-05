@@ -34,9 +34,9 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/functions.php";
             </div>
 
             <div class="bomber_game_table">
-                <template  v-for="bomber_game_status_bar_item in 10">
+                <template  v-for="bomber_game_status_bar_item in bomber_game.game_field_size">
                     <div class="bomber_game_row">
-                        <div v-for="bomber_game_status_bar_item1 in 10" class="cell"></div>
+                        <div v-for="bomber_game_status_bar_item1 in bomber_game.game_field_size" class="cell"></div>
                     </div>
                 </template>
             </div>
@@ -51,6 +51,7 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/functions.php";
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://unpkg.com/vue"></script>
+    <script src="<?=includeAssetFile( "/assets/js/tools.js" )?>"></script>
     <script src="<?=includeAssetFile( "/assets/js/bomber_game.js" )?>"></script>
     <script src="<?=includeAssetFile( "/assets/js/bomber.vue.js" )?>"></script>
 

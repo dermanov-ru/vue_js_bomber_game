@@ -6,7 +6,101 @@
  *
  *
  */
- 
-let BomberGame = {
 
+class Hero {
+    constructor(cell, cells) {
+        this.cell = cell;
+        this.cells = cells;
+        this.explode_power = 1;
+    }
+
+    render(){
+        this.cell.$el.addClass("hero");
+    }
+}
+
+class Cell {
+    constructor(el) {
+        this.$el = $(el);
+        this.is_wall = false;
+        this.is_exit_door_open = false;
+        this.is_contain_exit_door = false;
+    }
+
+    render(){
+        this.$el.attr("class", "cell");
+
+        if (this.is_wall)
+            this.$el.addClass("wall");
+
+        if (this.is_contain_exit_door)
+            this.$el.addClass("exit_door");
+
+        if (this.is_exit_door_open)
+            this.$el.addClass("open");
+    }
+
+}
+
+class BomberGame {
+    constructor(game_field_size){
+        this.game_field_size = game_field_size;
+        this.cells = [];
+        this.walls = [];
+        this.exit_door = null;
+        this.hero = null;
+    }
+
+    initGame($cells){
+        this.initCells($cells);
+        this.initWalls();
+        this.initHero();
+        this.initExitDoor();
+        // place mutants
+        // place power improver
+
+        this.renderGame();
+    }
+
+
+    // --- privat ---
+
+
+    initCells($cells){
+        for (let $cell of $cells){
+            let newCell = new Cell($cell);
+
+            this.cells.push(newCell);
+        }
+    }
+
+    initHero(){
+        this.hero = new Hero(this.cells[ 0 ], this.cells);
+    }
+
+    initWalls(){
+        let wallsCount = this.cells.length / 4;
+        let randomCells = Tools.shuffle( this.cells.slice(1) ).slice(0, wallsCount);
+
+        for (let cell of randomCells){
+            cell.is_wall = true;
+        }
+
+        this.walls = randomCells;
+    }
+
+    initExitDoor(){
+        let doorIndex = Tools.random(0, this.walls.length - 1);
+
+        this.walls[ doorIndex ].is_contain_exit_door = true;
+        this.exit_door = this.walls[ doorIndex ];
+    }
+
+    renderGame(){
+        for (let cell of this.cells){
+            cell.render();
+        }
+
+        this.hero.render();
+    }
 }

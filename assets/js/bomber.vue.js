@@ -9,10 +9,14 @@
 
 new Vue({
     el: '#bomber_game',
-    data: {},
+    data: {
+        bomber_game : new BomberGame(10)
+    },
     computed : {},
     mounted : function() {
+        this.bomber_game.initGame( $(".bomber_game .cell") );
 
+        console.log('this.bomber_game', this.bomber_game);
     },
     methods : {
 
