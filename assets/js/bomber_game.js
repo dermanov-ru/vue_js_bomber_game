@@ -57,9 +57,21 @@ class Around {
 
 class Monster {
     constructor(cell) {
-        cell.is_monster = true;
-
         this.cell = cell;
+        cell.is_monster = true;
+    }
+
+    wrap_with_earth(hero){
+        for (let aroundCell of this.cell.around.getAllAroundCells()){
+            if (!aroundCell)
+                continue;
+
+            if (hero.isLinearCell(aroundCell))
+                continue;
+
+            if (aroundCell.isEmptyCell())
+                aroundCell.is_earth = true;
+        }
     }
 
     render(){
@@ -72,6 +84,10 @@ class Hero {
     constructor(cell) {
         this.cell = cell;
         this.explode_power = 1;
+    }
+
+    isLinearCell(cell){
+        return this.cell.around.getLinearAroundCells().indexOf(cell) > -1
     }
 
     render(){
@@ -238,15 +254,6 @@ class BomberGame {
 
     initHero(){
         this.hero = new Hero(this.cells[ 0 ]);
-
-        let rightCell = this.hero.cell.getRightCell();
-        let bottomCell = this.hero.cell.getBottomCell();
-
-        // allow user to start game :)
-        if (!rightCell.isEnterableCell() && !bottomCell.isEnterableCell()){
-            rightCell.is_earth = false;
-            bottomCell.is_earth = false;
-        }
     }
 
     initWalls(){
@@ -277,6 +284,9 @@ class BomberGame {
             if (!cell.isEmptyCell())
                 continue;
 
+            if (this.hero.isLinearCell(cell))
+                continue;
+
             cell.is_earth = true;
             counter++;
         }
@@ -294,19 +304,12 @@ class BomberGame {
             if (!cell.isEmptyCell())
                 continue;
 
-            if (this.hero.cell.around.getAllAroundCells().indexOf(cell) > -1)
+            if (this.hero.isLinearCell(cell))
                 continue;
 
             let newMonster = new Monster(cell);
+            newMonster.wrap_with_earth(this.hero);
             this.monsters.push(newMonster);
-
-            for (let aroundCell of newMonster.cell.around.getAllAroundCells()){
-                if (!aroundCell)
-                    continue;
-
-                if (!aroundCell.is_wall)
-                    aroundCell.is_earth = true;
-            }
 
             spawnedMonsterCount++;
         }
