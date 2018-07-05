@@ -280,12 +280,18 @@ class BomberGame {
     }
 
     initEarth(){
-        let earthCount = this.cells.length / 5;
+        let earthCount = this.cells.length / 10; // TODO get from game level config
         let counter = 0;
         let randomCells = Tools.shuffle( this.cells.slice(1) );
 
         for (let i = 0 ; counter < earthCount && i < this.cells.length  ; i++){
             let cell = randomCells[ i ];
+
+            // already eatrh, after place monster
+            if (cell.is_earth){
+                counter++;
+                continue;
+            }
 
             if (!cell.isEmptyCell())
                 continue;
