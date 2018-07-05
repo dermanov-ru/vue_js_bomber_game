@@ -7,6 +7,17 @@
  *
  */
 
+class Monster {
+    constructor(cell, cells) {
+        this.cell = cell;
+        this.cells = cells;
+    }
+
+    render(){
+        this.cell.$el.addClass("monster"); // TODO render few types
+    }
+}
+
 class Hero {
     constructor(cell, cells) {
         this.cell = cell;
@@ -49,14 +60,17 @@ class BomberGame {
         this.walls = [];
         this.exit_door = null;
         this.hero = null;
+
+        this.monster_count = 4; // TODO get from game level param
+        this.monsters = [];
     }
 
     initGame($cells){
         this.initCells($cells);
         this.initWalls();
+        this.initMonsters();
         this.initHero();
         this.initExitDoor();
-        // place mutants
         // place power improver
 
         this.renderGame();
@@ -79,7 +93,7 @@ class BomberGame {
     }
 
     initWalls(){
-        let wallsCount = this.cells.length / 4;
+        let wallsCount = this.cells.length / 3;
         let randomCells = Tools.shuffle( this.cells.slice(1) ).slice(0, wallsCount);
 
         for (let cell of randomCells){
@@ -87,6 +101,25 @@ class BomberGame {
         }
 
         this.walls = randomCells;
+    }
+
+    initMonsters(){
+        let monsterCount = this.monster_count;
+        let spawnedMonsterCount = 0;
+        let randomCells = Tools.shuffle(this.cells.slice(1));
+
+        for (let cell of randomCells){
+            if (spawnedMonsterCount == monsterCount)
+                break;
+
+            if (cell.is_wall)
+                continue;
+
+            let newMonster = new Monster(cell, this.cells);
+            this.monsters.push(newMonster);
+
+            spawnedMonsterCount++;
+        }
     }
 
     initExitDoor(){
@@ -99,6 +132,10 @@ class BomberGame {
     renderGame(){
         for (let cell of this.cells){
             cell.render();
+        }
+
+        for (let monster of this.monsters){
+            monster.render();
         }
 
         this.hero.render();

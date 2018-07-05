@@ -66,6 +66,10 @@
 }
 
 .bomber_game .cell.hero {
+    background: gold;
+}
+
+.bomber_game .cell.monster {
     background: red;
 }
 
