@@ -29,63 +29,7 @@
     margin: 0 auto;
 }
 
-.minesweeper_table {
-    display: inline-block;
-    padding: 10px 0;
-}
-
-.minesweeper_row {
-    clear: both;
-}
-
-.bomber_game .cell {
-    width: 25px;
-    height: 25px;
-    border: 1px solid grey;
-    cursor: pointer;
-    margin: 1px;
-    font-size: 14px;
-    text-align: center;
-    line-height: 25px;
-    float: left;
-    font-weight: bold;
-}
-
-.bomber_game .cell.one {color: blue;}
-.bomber_game .cell.two {color: green;}
-.bomber_game .cell.three {color: darkgoldenrod;}
-.bomber_game .cell.four {color: palevioletred;}
-.bomber_game .cell.five {color: darkorchid;}
-.bomber_game .cell.six {color: steelblue;}
-.bomber_game .cell.seven {color: tomato;}
-.bomber_game .cell.eight {color: red;}
-
-.bomber_game .cell.closed {background: grey;}
-
-.bomber_game .cell.flag {
-    color: darkorange;
-    background: transparent;
-}
-.bomber_game .cell.flag i {
-    z-index: -1;
-    position: relative;
-}
-
-.bomber_game .cell.failed {
-    color: black;
-}
-
-.bomber_game .cell.mine {
-    color: red;
-    background: white;
-}
-
-.bomber_game .cell.open {
-    background: white;
-    cursor: default;
-}
-
-.minesweeper_status_bar {
+.bomber_game_status_bar {
     text-align: center;
     border: 1px dotted grey;
     border-radius: 5px;
@@ -93,8 +37,30 @@
     padding: 0 5px;
 }
 
-.minesweeper_status_bar_item {
+.bomber_game_status_bar_item {
     display: inline-block;
     padding: 10px 3px;
     font-size: 15px;
+}
+
+.bomber_game_table {
+    display: inline-block;
+    padding: 10px 0;
+}
+
+.bomber_game_row {
+    clear: both;
+}
+
+.bomber_game .cell {
+    width: 50px;
+    height: 50px;
+    border: 1px solid grey;
+    cursor: pointer;
+    margin: 0px;
+    font-size: 14px;
+    text-align: center;
+    line-height: 25px;
+    float: left;
+    font-weight: bold;
 }

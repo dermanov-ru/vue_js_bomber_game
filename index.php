@@ -29,22 +29,30 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/functions.php";
     <div id="bomber_game" class="bomber_game" v-cloak>
         
         <div >
-            <div class="minesweeper_status_bar titlle">
-                <div class="minesweeper_status_bar_item" title="">Игра «Бомбер»</div>
+            <div class="bomber_game_status_bar titlle">
+                <div class="bomber_game_status_bar_item" title="">Игра «Бомбер»</div>
             </div>
 
+            <div class="bomber_game_table">
+                <template  v-for="bomber_game_status_bar_item in 10">
+                    <div class="bomber_game_row">
+                        <div v-for="bomber_game_status_bar_item1 in 10" class="cell"></div>
+                    </div>
+                </template>
+            </div>
 
-            <div class="minesweeper_status_bar" >
-                <a class="minesweeper_status_bar_item orange" href="https://dermanov.ru#from=bomber_game" target="_blank">Марк Дерманов</a>
-                <div class="minesweeper_status_bar_item minesweeper_status_bar_item_sep">|</div>
-                <a class="minesweeper_status_bar_item orange" href="https://github.com/dermanov-ru/vue_js_bomber_game" target="_blank" >Fork me on GitHub</a>
+            <div class="bomber_game_status_bar" >
+                <a class="bomber_game_status_bar_item orange" href="https://dermanov.ru#from=bomber_game" target="_blank">Марк Дерманов</a>
+                <div class="bomber_game_status_bar_item bomber_game_status_bar_item_sep">|</div>
+                <a class="bomber_game_status_bar_item orange" href="https://github.com/dermanov-ru/vue_js_bomber_game" target="_blank" >Fork me on GitHub</a>
             </div>
         </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://unpkg.com/vue"></script>
-    <script src="<?=includeAssetFile("/assets/js/main.js")?>"></script>
+    <script src="<?=includeAssetFile( "/assets/js/bomber_game.js" )?>"></script>
+    <script src="<?=includeAssetFile( "/assets/js/bomber.vue.js" )?>"></script>
 
     <?
     if (file_exists(__DIR__ . "/counters.php"))
