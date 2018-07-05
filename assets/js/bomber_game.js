@@ -20,6 +20,38 @@ class Around {
         this.right_cell  = around_cells_matrix[ 4 ];
         this.top_cell    = around_cells_matrix[ 1 ];
         this.bottom_cell = around_cells_matrix[ 6 ];
+
+        this.top_left_cell   = around_cells_matrix[ 0 ];
+        this.top_right_cell  = around_cells_matrix[ 2 ];
+        this.bottom_left_cell   = around_cells_matrix[ 5 ];
+        this.bottom_right_cell  = around_cells_matrix[ 7 ];
+    }
+
+    getLinearAroundCells(){
+        let result = [];
+
+        result.push(this.left_cell);
+        result.push(this.right_cell);
+        result.push(this.top_cell);
+        result.push(this.bottom_cell);
+
+        return result;
+    }
+
+    getAllAroundCells(){
+        let result = [];
+
+        result.push(this.left_cell);
+        result.push(this.right_cell);
+        result.push(this.top_cell);
+        result.push(this.bottom_cell);
+
+        result.push(this.top_left_cell);
+        result.push(this.top_right_cell);
+        result.push(this.bottom_left_cell);
+        result.push(this.bottom_right_cell);
+
+        return result;
     }
 }
 
@@ -164,8 +196,8 @@ class BomberGame {
     initGame($cells){
         this.initCells($cells);
         this.initWalls();
-        this.initMonsters();
         this.initHero();
+        this.initMonsters();
         this.initExitDoor();
         // place power improver
 
@@ -222,6 +254,9 @@ class BomberGame {
                 break;
 
             if (cell.is_wall)
+                continue;
+
+            if (this.hero.cell.around.getAllAroundCells().indexOf(cell) > -1)
                 continue;
 
             let newMonster = new Monster(cell, this.cells);

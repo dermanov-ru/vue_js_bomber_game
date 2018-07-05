@@ -19,6 +19,11 @@ let BomberApp = new Vue({
         console.log('this.bomber_game', this.bomber_game);
     },
     methods : {
+        restart_game : function () {
+            this.bomber_game = new BomberGame(10);
+            this.bomber_game.initGame( $(".bomber_game .cell") );
+        },
+
         move_left : function () {
             this.bomber_game.getHero().move_left();
         },

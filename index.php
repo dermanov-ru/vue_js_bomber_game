@@ -34,6 +34,10 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/functions.php";
             </div>
 
             <div class="bomber_game_status_bar" >
+                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="restart_game" >Restart</a>
+            </div>
+
+            <div class="bomber_game_status_bar" >
                 <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_left" >Go Left</a>
                 <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_right" >Go Right</a>
                 <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_top" >Go Top</a>
