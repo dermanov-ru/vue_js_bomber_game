@@ -65,12 +65,17 @@
     font-weight: bold;
 }
 
+.bomber_game .cell i{
+    font-size: 25px;
+    line-height: 50px;
+}
+
 .bomber_game .cell.hero {
-    background: gold;
+    color: gold;
 }
 
 .bomber_game .cell.monster {
-    background: red;
+    color: red;
 }
 
 .bomber_game .cell.wall {
@@ -78,9 +83,9 @@
 }
 
 .bomber_game .cell.exit_door {
-    background: darkgreen;
+    color: brown;
 }
 
 .bomber_game .cell.exit_door.open {
-    background: greenyellow;
+    color: brown;
 }

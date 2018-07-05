@@ -15,6 +15,7 @@ class Monster {
 
     render(){
         this.cell.$el.addClass("monster"); // TODO render few types
+        this.cell.$el.html('<i class="fab fa-d-and-d"></i>');
     }
 }
 
@@ -27,6 +28,7 @@ class Hero {
 
     render(){
         this.cell.$el.addClass("hero");
+        this.cell.$el.html('<i class="fas fa-user-astronaut"></i>');
     }
 }
 
@@ -44,11 +46,13 @@ class Cell {
         if (this.is_wall)
             this.$el.addClass("wall");
 
-        if (this.is_contain_exit_door)
+        else if (this.is_contain_exit_door) {
             this.$el.addClass("exit_door");
+            this.$el.html('<i class="fas fa-door-closed"></i>');
+        }
 
         if (this.is_exit_door_open)
-            this.$el.addClass("open");
+            this.$el.html('<i class="fas fa-door-open"></i>');
     }
 
 }
