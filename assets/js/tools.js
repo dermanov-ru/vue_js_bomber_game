@@ -86,4 +86,54 @@ let Tools = {
 
         return cells_around;
     },
+
+    /**
+    * Extracts submatrix
+     *
+     * @param cells - origin flat matrix array items
+     * @param matrix_size - origin flat matrix size
+     *
+     * @example
+     * origin matrix 5x5
+     * 00|01|02|03|04
+     * 10|11|12|13|14
+     * 20|21|22|23|24
+     * 30|31|32|33|34
+     * 40|41|42|43|44
+     *
+     * Tools.sub_matrix([...], 5, 3, 0)
+     * will returns sub matrix 3x3
+     * 00|01|02
+     * 10|11|12
+     * 20|21|22
+     *
+     * @example Tools.sub_matrix([...], 5, 3, 1)
+     * will returns sub matrix 3x3
+     * 11|12|13
+     * 21|22|23
+     * 31|32|33
+     *
+     * @example Tools.sub_matrix([...], 5, 3, 2)
+     * will returns sub matrix 3x3
+     * 22|23|24
+     * 32|33|34
+     * 42|43|44
+    * */
+    sub_matrix : function(cells, matrix_size, sub_matrix_size, sub_matrix_offset) {
+        let sub_matrix = [];
+
+        for (let subY = 0; subY < sub_matrix_size; subY++){
+            for (let subX = 0; subX < sub_matrix_size; subX++){
+
+                let cellY = subY + sub_matrix_offset;
+                let cellX = subX + sub_matrix_offset;
+                let cell_index = cellY * matrix_size + cellX;
+                let cell = cells[ cell_index ];
+
+                sub_matrix.push(cell);
+            }
+        }
+
+        return sub_matrix;
+    }
 };

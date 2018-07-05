@@ -10,7 +10,7 @@
 let BomberApp = new Vue({
     el: '#bomber_game',
     data: {
-        bomber_game : new BomberGame(10)
+        bomber_game : new BomberGame(9)
     },
     computed : {},
     mounted : function() {
@@ -20,7 +20,7 @@ let BomberApp = new Vue({
     },
     methods : {
         restart_game : function () {
-            this.bomber_game = new BomberGame(10);
+            this.bomber_game = new BomberGame(9);
             this.bomber_game.initGame( $(".bomber_game .cell") );
         },
 

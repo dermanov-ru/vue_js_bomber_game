@@ -234,14 +234,20 @@ class BomberGame {
     }
 
     initWalls(){
-        let wallsCount = this.cells.length / 3;
-        let randomCells = Tools.shuffle( this.cells.slice(1) ).slice(0, wallsCount);
+        let wallsSubMatrixSize = this.game_field_size - 2;
+        let sub_matrix = Tools.sub_matrix(this.cells, this.game_field_size, wallsSubMatrixSize, 1);
 
-        for (let cell of randomCells){
-            cell.is_wall = true;
+        for (let subY = 0; subY < wallsSubMatrixSize; subY++){
+            for (let subX = 0; subX < wallsSubMatrixSize; subX++){
+                if (subX % 2 || subY % 2)
+                    continue;
+
+                let cell_index = subY * wallsSubMatrixSize + subX;
+                let cell = sub_matrix[ cell_index ];
+
+                cell.is_wall = true;
+            }
         }
-
-        this.walls = randomCells;
     }
 
     initMonsters(){
