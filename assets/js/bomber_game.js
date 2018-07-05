@@ -79,7 +79,7 @@ class Bomb {
         }
     }
 
-    startTimer(){
+    startTimer(after_explode_callback){
         let context = this;
 
         this.intervelId = setInterval(function () {
@@ -89,6 +89,7 @@ class Bomb {
             if (!context.timeout_seconds){
                 clearInterval(context.intervelId);
                 context.explode();
+                after_explode_callback();
             }
 
         }, 250 * this.timeout_seconds)
@@ -138,6 +139,7 @@ class Hero {
         this.cell = cell;
         this.safe_zone = [];
         this.explode_power = 1;
+        this.bomb_count = 1;
     }
 
     isLinearCell(cell){
@@ -204,9 +206,18 @@ class Hero {
     }
 
     place_bomb(){
+        if (!this.bomb_count)
+            return;
+
+        this.bomb_count--;
+
         let bomb = new Bomb(this.cell, this.explode_power);
         bomb.render();
-        bomb.startTimer();
+
+        let ctx = this;
+        bomb.startTimer(function () {
+            ctx.bomb_count++;
+        });
     }
 }
 
