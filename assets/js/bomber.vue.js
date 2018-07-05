@@ -14,9 +14,8 @@ let BomberApp = new Vue({
     },
     computed : {},
     mounted : function() {
-        this.bomber_game.initGame( $(".bomber_game .cell") );
-
-        console.log('this.bomber_game', this.bomber_game);
+        // rapid start game
+        this.restart_game();
     },
     methods : {
         restart_game : function () {
