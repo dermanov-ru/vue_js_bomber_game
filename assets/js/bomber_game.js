@@ -139,7 +139,7 @@ class Hero {
         this.cell = cell;
         this.safe_zone = [];
         this.explode_power = 1;
-        this.bomb_count = 1;
+        this.bomb_count = 999; // TODO set to 1 on relese :)
     }
 
     isLinearCell(cell){
@@ -425,12 +425,13 @@ class BomberGame {
         possibleDoorCells = Tools.shuffle(possibleDoorCells);
 
         for (let cell of possibleDoorCells){
-            if (!cell.is_wall)
+            if (!cell.is_earth)
                 continue
 
             cell.is_contain_exit_door = true;
             this.exit_door = cell;
 
+            cell.render();
             break;
         }
     }
