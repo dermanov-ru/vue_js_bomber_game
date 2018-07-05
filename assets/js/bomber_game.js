@@ -83,11 +83,16 @@ class Monster {
 class Hero {
     constructor(cell) {
         this.cell = cell;
+        this.safe_zone = [];
         this.explode_power = 1;
     }
 
     isLinearCell(cell){
         return this.cell.around.getLinearAroundCells().indexOf(cell) > -1
+    }
+
+    isSafeZoneCell(cell){
+        return this.safe_zone.indexOf(cell) > -1
     }
 
     render(){
@@ -254,6 +259,7 @@ class BomberGame {
 
     initHero(){
         this.hero = new Hero(this.cells[ 0 ]);
+        this.hero.safe_zone = Tools.sub_matrix(this.cells, this.game_field_size, 3, 0);
     }
 
     initWalls(){
@@ -304,7 +310,7 @@ class BomberGame {
             if (!cell.isEmptyCell())
                 continue;
 
-            if (this.hero.isLinearCell(cell))
+            if (this.hero.isSafeZoneCell(cell))
                 continue;
 
             let newMonster = new Monster(cell);
