@@ -162,12 +162,15 @@ class Hero {
             return;
 
         if (cell.isEnterableCell()){
-            this.move_to_cell(cell)
+            this.enter_cell(cell)
         }
     }
 
-    move_to_cell(cell){
+    enter_cell(cell){
+        this.cell.exit();
         this.cell.render();
+
+        cell.enter();
         this.cell = cell;
         this.render();
     }
@@ -179,7 +182,7 @@ class Hero {
             return;
 
         if (cell.isEnterableCell()){
-            this.move_to_cell(cell)
+            this.enter_cell(cell)
         }
     }
 
@@ -190,7 +193,7 @@ class Hero {
             return;
 
         if (cell.isEnterableCell()){
-            this.move_to_cell(cell)
+            this.enter_cell(cell)
         }
     }
 
@@ -201,7 +204,7 @@ class Hero {
             return;
 
         if (cell.isEnterableCell()){
-            this.move_to_cell(cell)
+            this.enter_cell(cell)
         }
     }
 
@@ -300,11 +303,38 @@ class Cell {
         this.is_bomb = false;
         this.render();
 
+        if (this.is_hero){
+            console.log("GAME OVER - you are exployed!");
+        }
+
         let context = this;
         setTimeout(function () {
             context.is_exployed = false;
             context.render();
         }, 700); // TODO extract timeout to config
+    }
+
+    exit(){
+        this.is_hero = false;
+    }
+
+    enter(){
+        this.is_hero = true;
+
+        if (this.is_exit_door_open){
+            console.log("YOU WIN - congratulations!");
+            // TODO implement end of game
+        }
+
+        if (this.is_monster){
+            console.log("GAME OVER - monster eat you!");
+            // TODO implement end of game
+        }
+
+        if (this.is_exployed){
+            console.log("GAME OVER - you are exployed!");
+            // TODO implement end of game
+        }
     }
 }
 
