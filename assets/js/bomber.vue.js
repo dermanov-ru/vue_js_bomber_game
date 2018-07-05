@@ -7,7 +7,7 @@
  *
  */
 
-new Vue({
+let BomberApp = new Vue({
     el: '#bomber_game',
     data: {
         bomber_game : new BomberGame(10)

@@ -7,6 +7,22 @@
  *
  */
 
+class Around {
+    /*
+    * around_cells_matrix - not contain current cell!
+    * C - is current cell
+    * 0|1|2
+    * 3|C|4
+    * 5|6|7
+    * */
+    constructor(around_cells_matrix) {
+        this.left_cell   = around_cells_matrix[ 3 ];
+        this.right_cell  = around_cells_matrix[ 4 ];
+        this.top_cell    = around_cells_matrix[ 1 ];
+        this.bottom_cell = around_cells_matrix[ 6 ];
+    }
+}
+
 class Monster {
     constructor(cell, cells) {
         this.cell = cell;
@@ -32,19 +48,59 @@ class Hero {
     }
 
     move_left(){
-        console.log("Hero move_left");
+        let cell = this.cell.getLeftCell();
+
+        if (cell){
+            if (cell.is_wall){
+                console.log("Hero can't move_left - WALL");
+            } else {
+                this.cell.render();
+                this.cell = cell;
+                this.render();
+            }
+        }
     }
 
     move_right(){
-        console.log("Hero move_right");
+        let cell = this.cell.getRightCell();
+
+        if (cell){
+            if (cell.is_wall){
+                console.log("Hero can't move_right - WALL");
+            } else {
+                this.cell.render();
+                this.cell = cell;
+                this.render();
+            }
+        }
     }
 
     move_top(){
-        console.log("Hero move_top");
+        let cell = this.cell.getTopCell();
+
+        if (cell){
+            if (cell.is_wall){
+                console.log("Hero can't move_top - WALL");
+            } else {
+                this.cell.render();
+                this.cell = cell;
+                this.render();
+            }
+        }
     }
 
     move_bottom(){
-        console.log("Hero move_bottom");
+        let cell = this.cell.getBottomCell();
+
+        if (cell){
+            if (cell.is_wall){
+                console.log("Hero can't move_bottom - WALL");
+            } else {
+                this.cell.render();
+                this.cell = cell;
+                this.render();
+            }
+        }
     }
 
     place_bomb(){
@@ -58,10 +114,12 @@ class Cell {
         this.is_wall = false;
         this.is_exit_door_open = false;
         this.is_contain_exit_door = false;
+        this.around = null;
     }
 
     render(){
         this.$el.attr("class", "cell");
+        this.$el.html("");
 
         if (this.is_wall)
             this.$el.addClass("wall");
@@ -75,6 +133,21 @@ class Cell {
             this.$el.html('<i class="fas fa-door-open"></i>');
     }
 
+    getLeftCell(){
+        return this.around.left_cell;
+    }
+
+    getRightCell(){
+        return this.around.right_cell;
+    }
+
+    getTopCell(){
+        return this.around.top_cell;
+    }
+
+    getBottomCell(){
+        return this.around.bottom_cell;
+    }
 }
 
 class BomberGame {
@@ -113,6 +186,11 @@ class BomberGame {
             let newCell = new Cell($cell);
 
             this.cells.push(newCell);
+        }
+
+        for (let cellIndex in this.cells){
+            let aroundCellsMatrix = Tools.get_around_cells(cellIndex, this.cells, this.game_field_size);
+            this.cells[ cellIndex].around = new Around(aroundCellsMatrix);
         }
     }
 
