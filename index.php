@@ -47,18 +47,6 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/functions.php";
                 <div class="bomber_game_status_bar_item" title="Количество бомб"><i class="fas fa-bomb"></i> {{bombs_count}}</div>
             </div>
 
-<!--            <div class="bomber_game_status_bar" >-->
-<!--                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_left" >Go Left</a>-->
-<!--                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_right" >Go Right</a>-->
-<!--                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_top" >Go Top</a>-->
-<!--                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_bottom" >Go Bottom</a>-->
-<!--                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="place_bomb" >Place bomb</a>-->
-<!--            </div>-->
-
-            <div class="bomber_game_status_bar" >
-                <input type="text" tabindex="1" @keyup.left="move_left" @keyup.right="move_right" @keyup.up="move_top" @keyup.down="move_bottom" @keyup.space="place_bomb" placeholder="navigation by keys there">
-            </div>
-
             <div class="bomber_game_table">
                 <template  v-for="bomber_game_status_bar_item in level.field_size">
                     <div class="bomber_game_row">

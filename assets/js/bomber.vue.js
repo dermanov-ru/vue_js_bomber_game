@@ -17,6 +17,8 @@ let BomberApp = new Vue({
         this.$nextTick(function () {
             this.restart_game();
         });
+
+        this.init_gamepad_control();
     },
     data: {
         level : {},
@@ -111,6 +113,46 @@ let BomberApp = new Vue({
 
         place_bomb : function () {
             this.bomber_game.getHero().place_bomb();
+        },
+
+        init_gamepad_control(){
+            // TODO if mobile
+            // this.initMobileGamePad();
+            // else
+            this.initDesktopGamePad();
+        },
+
+        initDesktopGamePad : function () {
+            let ctx = this;
+
+            window.addEventListener('keyup', function(event) {
+                // left
+                if (event.keyCode == 37) {
+                    ctx.move_left();
+                }
+                // right
+                if (event.keyCode == 39) {
+                    ctx.move_right();
+                }
+                // top
+                if (event.keyCode == 38) {
+                    ctx.move_top();
+                }
+                // down
+                if (event.keyCode == 40) {
+                    ctx.move_bottom();
+                }
+                // space
+                if (event.keyCode == 32) {
+                    event.preventDefault();
+                    ctx.place_bomb();
+                }
+                // escape
+                if (event.keyCode == 27) {
+                    ctx.restart_game();
+                }
+            });
         }
+
     },
 });
