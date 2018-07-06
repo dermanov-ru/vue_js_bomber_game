@@ -108,7 +108,8 @@ class Bomb {
 }
 
 class Monster {
-    constructor(cell) {
+    constructor(game, cell) {
+        this.game = game;
         this.cell = cell;
         cell.is_monster = true;
         this.intervelId = 0;
@@ -136,6 +137,8 @@ class Monster {
 
     explode(){
         this.stopWalk();
+        this.game.alive_monster_count--;
+        this.game.checkTimeToOpenExitDoor();
     }
 
     resetWalkStepsCount(){
@@ -239,7 +242,12 @@ class Hero {
 
     render(){
         this.cell.$el.addClass("hero");
-        this.cell.$el.append('<i class="fas fa-user-astronaut"></i>');
+        this.cell.$el.append('<i class="fas fa-user-astronaut hero"></i>');
+    }
+
+    animateEnterToDoor(){
+        this.cell.$el.find('.hero').css("right", "23%");
+        this.cell.$el.find('.hero').addClass("animated fadeInRight");
     }
 
     move_left(){
@@ -349,11 +357,13 @@ class Cell {
 
         else if (this.is_contain_exit_door) {
             this.$el.addClass("exit_door");
-            this.$el.append('<i class="fas fa-door-closed"></i>');
+
+            if (this.is_exit_door_open)
+                this.$el.append('<i class="fas fa-door-open exit_door"></i>');
+            else
+                this.$el.append('<i class="fas fa-door-closed exit_door"></i>');
         }
 
-        if (this.is_exit_door_open)
-            this.$el.append('<i class="fas fa-door-open"></i>');
 
         if (this.is_exployed){
             this.clean();
@@ -367,6 +377,9 @@ class Cell {
 
         if (this.is_hero){
             this.hero.render();
+
+            if (this.is_exit_door_open)
+                this.hero.animateEnterToDoor();
         }
 
         if (this.is_monster){
@@ -482,6 +495,7 @@ class BomberGame {
         this.hero = null;
 
         this.basic_monster_count = game_field_size; // TODO get from game level param
+        this.alive_monster_count = 0;
         this.monsters = [];
     }
 
@@ -495,6 +509,13 @@ class BomberGame {
         // place power improver
 
         this.renderGame();
+    }
+
+    checkTimeToOpenExitDoor(){
+        if (!this.exit_door.is_earth && !this.alive_monster_count){
+            this.exit_door.is_exit_door_open = true;
+            this.exit_door.render();
+        }
     }
 
     getHero(){
@@ -584,10 +605,11 @@ class BomberGame {
             if (this.hero.isSafeZoneCell(cell))
                 continue;
 
-            let newMonster = new Monster(cell);
+            let newMonster = new Monster(this, cell);
             newMonster.wrap_with_earth(this.hero);
             newMonster.walk();
-            this.monsters.push(newMonster);
+            // this.monsters.push(newMonster);
+            this.alive_monster_count++;
 
             cell.is_monster = true;
             cell.monster = newMonster;
@@ -607,9 +629,10 @@ class BomberGame {
             if (!cell.isEmptyCell())
                 continue;
 
-            let newMonster = new Monster(cell);
+            let newMonster = new Monster(this, cell);
             newMonster.walk();
-            this.monsters.push(newMonster);
+            // this.monsters.push(newMonster);
+            this.alive_monster_count++;
 
             cell.is_monster = true;
             cell.monster = newMonster;

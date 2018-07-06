@@ -66,13 +66,17 @@
     position: relative;
 }
 
-.bomber_game .cell i{
+.bomber_game .cell i {
     font-size: 25px;
     line-height: 50px;
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
+}
+
+.bomber_game .cell.hero.exit_door i {
+    width: 50%;
 }
 
 .bomber_game .cell.hero {
@@ -87,6 +91,7 @@
     color: black;
     z-index: 1;
 }
+
 .bomber_game .cell.hero .bomb {
     font-size: 15px;
     text-align: right;
@@ -106,10 +111,24 @@
     background: grey;
 }
 
-.bomber_game .cell.exit_door {
+.bomber_game .exit_door {
     color: brown;
 }
 
 .bomber_game .cell.exit_door.open {
     color: brown;
+}
+
+.bomber_game .cell.hero.exit_door i.exit_door {
+    left: 1%;
+}
+
+.bomber_game .cell.hero.exit_door i {
+    font-size: 20px;
+}
+
+.bomber_game .cell.hero.exit_door .hero {
+    font-size: 20px;
+    right: 0%;
+    left: auto;
 }
