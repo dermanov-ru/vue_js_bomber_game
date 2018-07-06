@@ -59,6 +59,41 @@ class Around {
     }
 }
 
+class BombImprover {
+    constructor(cell) {
+        this.cell = cell;
+    }
+
+    improveHero(hero){
+        hero.bomb_count++;
+    }
+
+    render(){
+        if (this.cell.is_earth)
+            return;
+
+        this.cell.$el.addClass("bomb");
+        this.cell.$el.append('<i class="fas fa-bomb green bomb"></i>');
+    }
+}
+
+class ExplodePowerImprover {
+    constructor(cell) {
+        this.cell = cell;
+    }
+
+    improveHero(hero){
+        hero.explode_power++;
+    }
+
+    render(){
+        if (this.cell.is_earth)
+            return;
+
+        this.cell.$el.append('<i class="fas fa-certificate gold"></i></i>');
+    }
+}
+
 class Bomb {
     constructor(cell, power) {
         this.cell = cell;
@@ -240,6 +275,7 @@ class Hero {
         this.bomb_count = 3; // TODO set to 1 on relese :)
         this.is_locked = false;
         this.is_exployed = false;
+        this.is_improved = false;
     }
 
     isLinearCell(cell){
@@ -257,10 +293,19 @@ class Hero {
         if (this.is_exployed){
             this.animateExplode();
         }
+
+        if (this.is_improved){
+            this.animateIproved();
+        }
     }
 
     animateExplode(){
         this.cell.$el.find('.hero').addClass("animated rotateOut");
+    }
+
+    animateIproved(){
+        this.cell.$el.find('.hero').addClass("animated bounceIn");
+        this.is_improved = false;
     }
 
     animateEnterToDoor(){
@@ -373,6 +418,8 @@ class Cell {
         this.bomb = null;
         this.hero = null;
         this.monster = null;
+
+        this.improver = null;
     }
 
     clean(){
@@ -421,6 +468,10 @@ class Cell {
 
         if (this.is_monster){
             this.monster.render();
+        }
+
+        if (this.improver){
+            this.improver.render();
         }
     }
 
@@ -509,6 +560,13 @@ class Cell {
             this.hero.is_exployed = true;
             this.game.endGame(false);
         }
+
+        if (this.improver){
+            this.hero.is_improved = true;
+            this.improver.improveHero(this.hero);
+            this.improver = null;
+            // this.hero.animateIproved();
+        }
     }
 
     enterMonster(moster){
@@ -549,7 +607,7 @@ class BomberGame {
         this.initMonsters(this.basic_monster_count);
         this.initEarth();
         this.initExitDoor();
-        // place power improver
+        this.initImprovers();
 
         this.renderGame();
     }
@@ -634,6 +692,36 @@ class BomberGame {
 
             cell.is_earth = true;
             counter++;
+        }
+    }
+
+    initImprovers(){
+        let maxBombsImp = 1; // TODO get from level config
+        let maxPowerImp = 1; // TODO get from level config
+        let counter = 0;
+        let cells = Tools.shuffle(this.cells);
+
+        for (let cell of cells){
+            if (!cell.is_earth || cell.is_contain_exit_door || cell.improver)
+                continue;
+
+            cell.improver = new BombImprover(cell);
+            counter++;
+
+            if (counter == maxBombsImp)
+                break;
+        }
+
+        counter = 0;
+        for (let cell of cells){
+            if (!cell.is_earth || cell.is_contain_exit_door || cell.improver)
+                continue;
+
+            cell.improver = new ExplodePowerImprover(cell);
+            counter++;
+
+            if (counter == maxPowerImp)
+                break;
         }
     }
 
