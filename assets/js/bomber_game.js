@@ -238,6 +238,7 @@ class Cell {
 
         this.bomb = null;
         this.hero = null;
+        this.monster = null;
     }
 
     clean(){
@@ -276,6 +277,10 @@ class Cell {
 
         if (this.is_hero){
             this.hero.render();
+        }
+
+        if (this.is_monster){
+            this.monster.render();
         }
     }
 
@@ -395,8 +400,13 @@ class BomberGame {
     }
 
     initHero(){
-        this.hero = new Hero(this.cells[ 0 ]);
+        let heroCell = this.cells[ 0 ];
+
+        this.hero = new Hero(heroCell);
         this.hero.safe_zone = Tools.sub_matrix(this.cells, this.game_field_size, 3, 0);
+
+        heroCell.is_hero = true;
+        heroCell.hero = this.hero;
     }
 
     initWalls(){
@@ -460,6 +470,9 @@ class BomberGame {
             newMonster.wrap_with_earth(this.hero);
             this.monsters.push(newMonster);
 
+            cell.is_monster = true;
+            cell.monster = newMonster;
+
             spawnedMonsterCount++;
         }
     }
@@ -484,11 +497,5 @@ class BomberGame {
         for (let cell of this.cells){
             cell.render();
         }
-
-        for (let monster of this.monsters){
-            monster.render();
-        }
-
-        this.hero.render();
     }
 }
