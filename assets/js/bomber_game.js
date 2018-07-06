@@ -421,7 +421,7 @@ class Cell {
         }
 
         if (this.is_contain_exit_door && !this.is_earth){
-            let addMonsterCount = Math.ceil(this.game.monster_count / 3);
+            let addMonsterCount = Math.ceil(this.game.basic_monster_count / 3);
             this.game.addMonsters( addMonsterCount );
         }
 
@@ -481,7 +481,7 @@ class BomberGame {
         this.exit_door = null;
         this.hero = null;
 
-        this.monster_count = game_field_size; // TODO get from game level param
+        this.basic_monster_count = game_field_size; // TODO get from game level param
         this.monsters = [];
     }
 
@@ -489,7 +489,7 @@ class BomberGame {
         this.initCells($cells);
         this.initWalls();
         this.initHero();
-        this.initMonsters(this.monster_count);
+        this.initMonsters(this.basic_monster_count);
         this.initEarth();
         this.initExitDoor();
         // place power improver
