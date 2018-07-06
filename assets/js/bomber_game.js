@@ -314,8 +314,9 @@ class Hero {
 }
 
 class Cell {
-    constructor(el) {
-        this.$el = $(el);
+    constructor(game, domNode) {
+        this.game = game;
+        this.$el = $(domNode);
         this.is_earth = false;
         this.is_wall = false;
         this.is_monster = false;
@@ -398,7 +399,7 @@ class Cell {
     }
 
     isEmptyCell(){
-        return !(this.is_wall || this.is_earth || this.is_monster);
+        return !(this.is_wall || this.is_earth || this.is_monster || this.is_contain_exit_door || this.is_hero);
     }
 
     explode(){
@@ -417,6 +418,11 @@ class Cell {
 
         if (this.is_hero){
             console.log("GAME OVER - you are exployed!");
+        }
+
+        if (this.is_contain_exit_door && !this.is_earth){
+            let addMonsterCount = Math.ceil(this.game.monster_count / 3);
+            this.game.addMonsters( addMonsterCount );
         }
 
         let context = this;
@@ -483,7 +489,7 @@ class BomberGame {
         this.initCells($cells);
         this.initWalls();
         this.initHero();
-        this.initMonsters();
+        this.initMonsters(this.monster_count);
         this.initEarth();
         this.initExitDoor();
         // place power improver
@@ -501,7 +507,7 @@ class BomberGame {
 
     initCells($cells){
         for (let $cell of $cells){
-            let newCell = new Cell($cell);
+            let newCell = new Cell(this, $cell);
 
             this.cells.push(newCell);
         }
@@ -564,8 +570,7 @@ class BomberGame {
         }
     }
 
-    initMonsters(){
-        let monsterCount = this.monster_count;
+    initMonsters(monsterCount){
         let spawnedMonsterCount = 0;
         let randomCells = Tools.shuffle(this.cells.slice(1));
 
@@ -586,6 +591,29 @@ class BomberGame {
 
             cell.is_monster = true;
             cell.monster = newMonster;
+
+            spawnedMonsterCount++;
+        }
+    }
+
+    addMonsters(monsterCount){
+        let spawnedMonsterCount = 0;
+        let randomCells = Tools.shuffle(this.cells);
+
+        for (let cell of randomCells){
+            if (spawnedMonsterCount == monsterCount)
+                break;
+
+            if (!cell.isEmptyCell())
+                continue;
+
+            let newMonster = new Monster(cell);
+            newMonster.walk();
+            this.monsters.push(newMonster);
+
+            cell.is_monster = true;
+            cell.monster = newMonster;
+            cell.render();
 
             spawnedMonsterCount++;
         }
