@@ -112,6 +112,8 @@ class Monster {
         this.cell = cell;
         cell.is_monster = true;
         this.intervelId = 0;
+        this.walk_direction = "none";
+        this.walk_steps_count = 1;
     }
 
     wrap_with_earth(hero){
@@ -133,34 +135,89 @@ class Monster {
     }
 
     explode(){
+        this.stopWalk();
+    }
+
+    resetWalkStepsCount(){
+        this.walk_steps_count = Tools.random(1, 10);
+    }
+
+    changeWalkDirection(oldDirection){
+        this.walk_direction = Tools.shuffle(["left", "right", "top", "bottom"]).pop();
+
+        if (this.walk_direction == oldDirection){
+            this.changeWalkDirection(oldDirection);
+            return;
+        }
+
+        this.resetWalkStepsCount();
+    }
+
+    changeWalkDirectionLinear(oldDirection){
+        let linearDirections = {
+            "left" : "right",
+            "top" : "bottom",
+            "right" : "left",
+            "bottom" : "top"
+        }
+
+        this.walk_direction = linearDirections[ oldDirection ];
+        this.resetWalkStepsCount();
+    }
+
+    stopWalk(){
         clearInterval(this.intervelId);
     }
 
     walk(){
         let context = this;
 
+        this.changeWalkDirection();
+
         this.intervelId = setInterval(function () {
-            let linearCells = context.cell.around.getLinearAroundCells(1);
-            linearCells = Tools.shuffle(linearCells);
+            let around = context.cell.around;
+            let cell;
 
-            for (let cell of linearCells){
-                if (cell && cell.isEnterableCell()){
-                    context.cell.is_monster = false;
-
-                    cell.is_monster = true;
-                    cell.monster = context;
-                    cell.enterMonster(context);
-
-                    context.cell.render();
-                    context.cell = cell;
-
-                    cell.render();
-
+            switch (context.walk_direction){
+                case "top":
+                    cell = around.top_cell;
                     break;
-                }
+                case "left":
+                    cell = around.left_cell;
+                    break;
+                case "right":
+                    cell = around.right_cell;
+                    break;
+                case "bottom":
+                    cell = around.bottom_cell;
+                    break;
             }
 
-        }, 800);
+            if (!cell){
+                context.changeWalkDirection(context.walk_direction);
+                return;
+            }
+
+            if (cell.isEnterableForMonster()){
+                context.cell.is_monster = false;
+
+                cell.is_monster = true;
+                cell.monster = context;
+                cell.enterMonster(context);
+
+                context.cell.render();
+                context.cell = cell;
+
+                cell.render();
+
+                context.walk_steps_count--;
+                if (!context.walk_steps_count)
+                    context.changeWalkDirection(context.walk_direction);
+            } else {
+                context.changeWalkDirection(context.walk_direction);
+            }
+
+        }, 700); // TODO get from config
     }
 }
 
@@ -334,6 +391,10 @@ class Cell {
 
     isEnterableCell(){
         return !(this.is_wall || this.is_earth || this.is_bomb);
+    }
+
+    isEnterableForMonster(){
+        return !(this.is_wall || this.is_earth || this.is_bomb || this.is_monster);
     }
 
     isEmptyCell(){
