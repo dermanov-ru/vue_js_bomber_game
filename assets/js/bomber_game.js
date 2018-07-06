@@ -441,7 +441,7 @@ class Cell {
         this.render();
 
         if (this.is_hero){
-            console.log("GAME OVER - you are exployed!");
+            this.game.endGame(false);
         }
 
         if (this.is_contain_exit_door && !this.is_earth){
@@ -467,18 +467,15 @@ class Cell {
         this.hero = hero;
 
         if (this.is_exit_door_open){
-            console.log("YOU WIN - congratulations!");
-            // TODO implement end of game
+            this.game.endGame(true);
         }
 
         if (this.is_monster){
-            console.log("GAME OVER - monster eat you!");
-            // TODO implement end of game
+            this.game.endGame(false);
         }
 
         if (this.is_exployed){
-            console.log("GAME OVER - you are exployed!");
-            // TODO implement end of game
+            this.game.endGame(false);
         }
     }
 
@@ -492,8 +489,7 @@ class Cell {
         }
 
         if (this.is_hero){
-            console.log("GAME OVER - monster eat you!");
-            // TODO implement end of game
+            this.game.endGame(false);
         }
     }
 }
@@ -509,6 +505,8 @@ class BomberGame {
         this.basic_monster_count = game_field_size; // TODO get from game level param
         this.alive_monster_count = 0;
         this.monsters = [];
+
+        this.on_game_end_callback = null;
     }
 
     initGame($cells){
@@ -535,12 +533,7 @@ class BomberGame {
     }
 
     destroy(){
-        for (let cell of this.cells){
-            if (!cell.is_monster)
-                continue;
-
-            cell.monster.stopWalk();
-        }
+        this.stopMonsters();
     }
 
     // --- privat ---
@@ -681,6 +674,40 @@ class BomberGame {
     renderGame(){
         for (let cell of this.cells){
             cell.render();
+        }
+    }
+
+    endGame(is_win){
+        if (is_win)
+            this.winGame();
+        else
+            this.loseGame();
+
+        if (this.on_game_end_callback){
+            let ctx = this;
+
+            // wait end of user enter animation
+            setTimeout(function () {
+                ctx.on_game_end_callback(is_win);
+            }, 500);
+        }
+    }
+
+    winGame(){
+        console.log("GAME WIN - go to next level");
+    }
+
+    loseGame(){
+        console.log("GAME OVER");
+        this.stopMonsters()
+    }
+
+    stopMonsters(){
+        for (let cell of this.cells){
+            if (!cell.is_monster)
+                continue;
+
+            cell.monster.stopWalk();
         }
     }
 }

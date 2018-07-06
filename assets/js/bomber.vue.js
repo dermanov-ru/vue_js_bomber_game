@@ -36,6 +36,27 @@ let BomberApp = new Vue({
                 monster_count : 7,
                 bombs_count : 2,
                 explode_power : 1,
+            },
+            {
+                title : "3",
+                field_size : 9,
+                monster_count : 9,
+                bombs_count : 2,
+                explode_power : 1,
+            },
+            {
+                title : "4",
+                field_size : 11,
+                monster_count : 11,
+                bombs_count : 2,
+                explode_power : 1,
+            },
+            {
+                title : "5",
+                field_size : 13,
+                monster_count : 13,
+                bombs_count : 2,
+                explode_power : 1,
             }
         ],
         bomber_game : null,
@@ -87,15 +108,46 @@ let BomberApp = new Vue({
             this.game_time_seconds = 0;
             clearInterval(this.timer);
         },
-        restart_game : function () {
+        start_game : function () {
             if (this.bomber_game)
                 this.bomber_game.destroy();
 
             this.bomber_game = new BomberGame(this.level.field_size, this.level.monster_count );
             this.bomber_game.initGame( $(".bomber_game .cell") );
+            this.bomber_game.on_game_end_callback = this.game_end;
+        },
+        restart_game : function () {
+            this.start_game();
 
             this.reset_timer();
             this.start_timer();
+        },
+
+        game_end : function(is_win){
+            if (is_win){
+                this.start_next_level();
+            }  else {
+                // TODO show message
+                this.stop_timer();
+            }
+        },
+
+        start_next_level : function(){
+            let oldLevel = this.levels.indexOf(this.level);
+            let nextLevel = this.levels[ oldLevel + 1 ];
+
+            if (!nextLevel){
+                // TODO show user message
+                console.log("YOU WIN AT ALL GAME!");
+                return;
+            }
+
+            this.level = nextLevel;
+
+            // wait while field render
+            this.$nextTick(function () {
+                this.start_game();
+            });
         },
 
         move_left : function () {
