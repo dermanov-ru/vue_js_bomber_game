@@ -229,7 +229,7 @@ class Hero {
         this.cell = cell;
         this.safe_zone = [];
         this.explode_power = 1;
-        this.bomb_count = 999; // TODO set to 1 on relese :)
+        this.bomb_count = 3; // TODO set to 1 on relese :)
     }
 
     isLinearCell(cell){

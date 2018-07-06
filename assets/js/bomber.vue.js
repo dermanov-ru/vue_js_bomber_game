@@ -9,18 +9,88 @@
 
 let BomberApp = new Vue({
     el: '#bomber_game',
-    data: {
-        bomber_game : new BomberGame(15)
-    },
-    computed : {},
     mounted : function() {
         // rapid start game
-        this.restart_game();
+        this.level = this.levels[ 0 ];
+
+        // wait while field render
+        this.$nextTick(function () {
+            this.restart_game();
+        });
+    },
+    data: {
+        level : {},
+        levels : [
+            {
+                title : "1",
+                field_size : 5,
+                monster_count : 5,
+                bombs_count : 1,
+                explode_power : 1,
+            },
+            {
+                title : "2",
+                field_size : 7,
+                monster_count : 7,
+                bombs_count : 2,
+                explode_power : 1,
+            }
+        ],
+        bomber_game : null,
+
+        game_time_seconds : 0,
+        timer : 0,
+    },
+    computed : {
+        game_time_formated : function () {
+            var result = "";
+
+            result += Math.round(this.game_time_seconds / 3600) + ":";
+            result += Math.round(this.game_time_seconds % 3600 / 60) + ":";
+            result += Math.round(this.game_time_seconds % 60) + "";
+
+            return result;
+        },
+        monsters_count : function() {
+            if (!this.bomber_game)
+                return 0;
+
+            return this.bomber_game.alive_monster_count;
+        },
+        bombs_count : function() {
+            if (!this.bomber_game)
+                return 0;
+
+            return this.bomber_game.hero.bomb_count;
+        },
+        explode_power : function() {
+            if (!this.bomber_game)
+                return 0;
+
+            return this.bomber_game.hero.explode_power;
+        }
     },
     methods : {
+        start_timer : function() {
+            let app_context = this;
+
+            this.timer = setInterval(function () {
+                app_context.game_time_seconds++;
+            }, 1000);
+        },
+        stop_timer : function() {
+            clearInterval(this.timer);
+        },
+        reset_timer : function() {
+            this.game_time_seconds = 0;
+            clearInterval(this.timer);
+        },
         restart_game : function () {
-            this.bomber_game = new BomberGame(15);
+            this.bomber_game = new BomberGame(this.level.field_size, this.level.monster_count );
             this.bomber_game.initGame( $(".bomber_game .cell") );
+
+            this.reset_timer();
+            this.start_timer();
         },
 
         move_left : function () {

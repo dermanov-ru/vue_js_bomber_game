@@ -34,25 +34,35 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/functions.php";
             </div>
 
             <div class="bomber_game_status_bar" >
-                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="restart_game" >Restart</a>
+                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="restart_game" >Restart game</a>
+                <div class="bomber_game_status_bar_item bomber_game_status_bar_item_sep">|</div>
+                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="restart_game" >Restart level</a>
             </div>
 
             <div class="bomber_game_status_bar" >
-                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_left" >Go Left</a>
-                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_right" >Go Right</a>
-                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_top" >Go Top</a>
-                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_bottom" >Go Bottom</a>
-                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="place_bomb" >Place bomb</a>
+                <div class="bomber_game_status_bar_item" title="Уровень игры"><i class="fas fa-signal"></i> {{level.title}}</div>
+                <div class="bomber_game_status_bar_item" title="Время игры"><i class="far fa-clock"></i> {{game_time_formated}}</div>
+                <div class="bomber_game_status_bar_item" title="Осталось взорвать монстров"><i class="fab fa-d-and-d red"></i> {{monsters_count}}</div>
+                <div class="bomber_game_status_bar_item" title="Мощность взрыва"><i class="fas fa-certificate gold"></i> {{explode_power}}</div>
+                <div class="bomber_game_status_bar_item" title="Количество бомб"><i class="fas fa-bomb"></i> {{bombs_count}}</div>
             </div>
+
+<!--            <div class="bomber_game_status_bar" >-->
+<!--                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_left" >Go Left</a>-->
+<!--                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_right" >Go Right</a>-->
+<!--                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_top" >Go Top</a>-->
+<!--                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="move_bottom" >Go Bottom</a>-->
+<!--                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="place_bomb" >Place bomb</a>-->
+<!--            </div>-->
 
             <div class="bomber_game_status_bar" >
                 <input type="text" tabindex="1" @keyup.left="move_left" @keyup.right="move_right" @keyup.up="move_top" @keyup.down="move_bottom" @keyup.space="place_bomb" placeholder="navigation by keys there">
             </div>
 
             <div class="bomber_game_table">
-                <template  v-for="bomber_game_status_bar_item in bomber_game.game_field_size">
+                <template  v-for="bomber_game_status_bar_item in level.field_size">
                     <div class="bomber_game_row">
-                        <div v-for="bomber_game_status_bar_item1 in bomber_game.game_field_size" class="cell"></div>
+                        <div v-for="bomber_game_status_bar_item1 in level.field_size" class="cell"></div>
                     </div>
                 </template>
             </div>
