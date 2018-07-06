@@ -30,14 +30,82 @@ class Around {
     getLinearAroundCells(depth){
         let result = [];
 
-        // for (let i = 0 ; i <result depth ; i++){
-        //     let left
-        // }
+        let left_cell;
+        let right_cell;
+        let top_cell;
+        let bottom_cell;
+        let aroud = this;
 
-        result.push(this.left_cell);
-        result.push(this.right_cell);
-        result.push(this.top_cell);
-        result.push(this.bottom_cell);
+        // left
+        for (let i = 0 ; i < depth ; i++){
+            left_cell = aroud.left_cell;
+
+            if (!left_cell)
+                break;
+
+            if (left_cell.is_wall)
+                break;
+
+            aroud = left_cell.around;
+            result.push(left_cell);
+
+            if (left_cell.is_earth)
+                break;
+        }
+
+        // right
+        aroud = this;
+        for (let i = 0 ; i < depth ; i++){
+            right_cell = aroud.right_cell;
+
+            if (!right_cell)
+                break;
+
+            if (right_cell.is_wall)
+                break;
+
+            aroud = right_cell.around;
+            result.push(right_cell);
+
+            if (right_cell.is_earth)
+                break;
+        }
+
+        // top
+        aroud = this;
+        for (let i = 0 ; i < depth ; i++){
+            top_cell = aroud.top_cell;
+
+            if (!top_cell)
+                break;
+
+            if (top_cell.is_wall)
+                break;
+
+            aroud = top_cell.around;
+            result.push(top_cell);
+
+            if (top_cell.is_earth)
+                break;
+        }
+
+        // bottom
+        aroud = this;
+        for (let i = 0 ; i < depth ; i++){
+            bottom_cell = aroud.bottom_cell;
+
+            if (!bottom_cell)
+                break;
+
+            if (bottom_cell.is_wall)
+                break;
+
+            aroud = bottom_cell.around;
+            result.push(bottom_cell);
+
+            if (bottom_cell.is_earth)
+                break;
+        }
 
         return result;
     }
@@ -156,7 +224,7 @@ class Monster {
         let max = 3;
         let counter = 0;
 
-        for (let aroundCell of this.cell.around.getLinearAroundCells()){
+        for (let aroundCell of this.cell.around.getLinearAroundCells(1)){
             if (!aroundCell)
                 continue;
 
@@ -272,14 +340,14 @@ class Hero {
         this.cell = cell;
         this.safe_zone = [];
         this.explode_power = 1;
-        this.bomb_count = 3; // TODO set to 1 on relese :)
+        this.bomb_count = 1;
         this.is_locked = false;
         this.is_exployed = false;
         this.is_improved = false;
     }
 
     isLinearCell(cell){
-        return this.cell.around.getLinearAroundCells().indexOf(cell) > -1
+        return this.cell.around.getLinearAroundCells(1).indexOf(cell) > -1
     }
 
     isSafeZoneCell(cell){
