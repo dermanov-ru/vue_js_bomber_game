@@ -238,6 +238,8 @@ class Hero {
         this.safe_zone = [];
         this.explode_power = 1;
         this.bomb_count = 3; // TODO set to 1 on relese :)
+        this.is_locked = false;
+        this.is_exployed = false;
     }
 
     isLinearCell(cell){
@@ -251,6 +253,14 @@ class Hero {
     render(){
         this.cell.$el.addClass("hero");
         this.cell.$el.append('<i class="fas fa-user-astronaut hero"></i>');
+
+        if (this.is_exployed){
+            this.animateExplode();
+        }
+    }
+
+    animateExplode(){
+        this.cell.$el.find('.hero').addClass("animated rotateOut");
     }
 
     animateEnterToDoor(){
@@ -259,6 +269,9 @@ class Hero {
     }
 
     move_left(){
+        if (this.is_locked)
+            return;
+
         let cell = this.cell.getLeftCell();
 
         if (!cell)
@@ -279,6 +292,9 @@ class Hero {
     }
 
     move_right(){
+        if (this.is_locked)
+            return;
+
         let cell = this.cell.getRightCell();
 
         if (!cell)
@@ -290,6 +306,9 @@ class Hero {
     }
 
     move_top(){
+        if (this.is_locked)
+            return;
+
         let cell = this.cell.getTopCell();
 
         if (!cell)
@@ -301,6 +320,9 @@ class Hero {
     }
 
     move_bottom(){
+        if (this.is_locked)
+            return;
+
         let cell = this.cell.getBottomCell();
 
         if (!cell)
@@ -312,6 +334,9 @@ class Hero {
     }
 
     place_bomb(){
+        if (this.is_locked)
+            return;
+
         if (!this.bomb_count)
             return;
 
@@ -391,6 +416,7 @@ class Cell {
 
             if (this.is_exit_door_open)
                 this.hero.animateEnterToDoor();
+
         }
 
         if (this.is_monster){
@@ -438,11 +464,14 @@ class Cell {
         }
 
         this.is_bomb = false;
-        this.render();
 
         if (this.is_hero){
+            this.hero.is_exployed = true;
             this.game.endGame(false);
         }
+
+        this.render();
+
 
         if (this.is_contain_exit_door && !this.is_earth){
             let addMonsterCount = Math.ceil(this.game.basic_monster_count / 3);
@@ -454,6 +483,7 @@ class Cell {
         setTimeout(function () {
             context.is_earth = false;
             context.is_exployed = false;
+            context.is_hero = false;
             context.render();
         }, 700); // TODO extract timeout to config
     }
@@ -471,10 +501,12 @@ class Cell {
         }
 
         if (this.is_monster){
+            this.hero.is_exployed = true;
             this.game.endGame(false);
         }
 
         if (this.is_exployed){
+            this.hero.is_exployed = true;
             this.game.endGame(false);
         }
     }
@@ -489,6 +521,7 @@ class Cell {
         }
 
         if (this.is_hero){
+            this.hero.is_exployed = true;
             this.game.endGame(false);
         }
     }
@@ -699,7 +732,9 @@ class BomberGame {
 
     loseGame(){
         console.log("GAME OVER");
+
         this.stopMonsters()
+        this.lockHero()
     }
 
     stopMonsters(){
@@ -709,5 +744,9 @@ class BomberGame {
 
             cell.monster.stopWalk();
         }
+    }
+
+    lockHero(){
+        this.hero.is_locked = true;
     }
 }
