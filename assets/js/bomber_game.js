@@ -436,6 +436,7 @@ class Cell {
         if (this.is_contain_exit_door && !this.is_earth){
             let addMonsterCount = Math.ceil(this.game.basic_monster_count / 3);
             this.game.addMonsters( addMonsterCount );
+            this.is_exit_door_open = false;
         }
 
         let context = this;
