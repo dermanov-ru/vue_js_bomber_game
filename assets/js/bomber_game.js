@@ -398,6 +398,11 @@ class Cell {
             this.is_monster = false;
             this.moster.explode();
         }
+
+        if (this.is_hero){
+            console.log("GAME OVER - monster eat you!");
+            // TODO implement end of game
+        }
     }
 }
 
