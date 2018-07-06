@@ -345,7 +345,6 @@ class Cell {
             return;
 
         this.is_exployed = true;
-        this.is_earth = false;
 
         if (this.is_monster) {
             this.is_monster = false;
@@ -361,6 +360,7 @@ class Cell {
 
         let context = this;
         setTimeout(function () {
+            context.is_earth = false;
             context.is_exployed = false;
             context.render();
         }, 700); // TODO extract timeout to config
