@@ -88,6 +88,9 @@ let BomberApp = new Vue({
             clearInterval(this.timer);
         },
         restart_game : function () {
+            if (this.bomber_game)
+                this.bomber_game.destroy();
+
             this.bomber_game = new BomberGame(this.level.field_size, this.level.monster_count );
             this.bomber_game.initGame( $(".bomber_game .cell") );
 

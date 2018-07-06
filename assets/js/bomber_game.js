@@ -531,6 +531,14 @@ class BomberGame {
         return this.hero;
     }
 
+    destroy(){
+        for (let cell of this.cells){
+            if (!cell.is_monster)
+                continue;
+
+            cell.monster.stopWalk();
+        }
+    }
 
     // --- privat ---
 
