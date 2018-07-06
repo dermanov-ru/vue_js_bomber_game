@@ -111,6 +111,7 @@ class Monster {
     constructor(cell) {
         this.cell = cell;
         cell.is_monster = true;
+        this.intervelId = 0;
     }
 
     wrap_with_earth(hero){
@@ -129,6 +130,29 @@ class Monster {
     render(){
         this.cell.$el.addClass("monster"); // TODO render few types
         this.cell.$el.append('<i class="fab fa-d-and-d"></i>');
+    }
+
+    walk(){
+        let context = this;
+
+        this.intervelId = setInterval(function () {
+            let linearCells = context.cell.around.getLinearAroundCells(1);
+            linearCells = Tools.shuffle(linearCells);
+
+            for (let cell of linearCells){
+                if (cell && cell.isEnterableCell()){
+                    context.cell.is_monster = false;
+                    cell.is_monster = true;
+                    cell.monster = context;
+                    context.cell.render();
+                    context.cell = cell;
+                    cell.render();
+
+                    break;
+                }
+            }
+
+        }, 800);
     }
 }
 
@@ -468,6 +492,7 @@ class BomberGame {
 
             let newMonster = new Monster(cell);
             newMonster.wrap_with_earth(this.hero);
+            newMonster.walk();
             this.monsters.push(newMonster);
 
             cell.is_monster = true;
