@@ -90,7 +90,7 @@ class Bomb {
                 after_explode_callback();
             }
 
-        }, 250 * this.timeout_seconds)
+        }, 200 * this.timeout_seconds)
     }
 
     explode(){
