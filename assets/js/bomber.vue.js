@@ -128,31 +128,36 @@ let BomberApp = new Vue({
         initDesktopGamePad : function () {
             let ctx = this;
 
-            window.addEventListener('keyup', function(event) {
+            window.addEventListener('keydown', function(event) {
                 // left
                 if (event.keyCode == 37) {
                     ctx.move_left();
+                    event.preventDefault();
                 }
                 // right
                 if (event.keyCode == 39) {
                     ctx.move_right();
+                    event.preventDefault();
                 }
                 // top
                 if (event.keyCode == 38) {
                     ctx.move_top();
+                    event.preventDefault();
                 }
                 // down
                 if (event.keyCode == 40) {
                     ctx.move_bottom();
+                    event.preventDefault();
                 }
                 // space
                 if (event.keyCode == 32) {
-                    event.preventDefault();
                     ctx.place_bomb();
+                    event.preventDefault();
                 }
                 // escape
                 if (event.keyCode == 27) {
                     ctx.restart_game();
+                    event.preventDefault();
                 }
             });
         }
