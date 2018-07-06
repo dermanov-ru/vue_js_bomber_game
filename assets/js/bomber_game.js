@@ -315,6 +315,9 @@ class Hero {
         if (!this.bomb_count)
             return;
 
+        if (this.cell.is_bomb)
+            return;
+
         this.bomb_count--;
 
         let bomb = new Bomb(this.cell, this.explode_power);
