@@ -118,7 +118,10 @@ class Monster {
     }
 
     wrap_with_earth(hero){
-        for (let aroundCell of this.cell.around.getAllAroundCells()){
+        let max = 3;
+        let counter = 0;
+
+        for (let aroundCell of this.cell.around.getLinearAroundCells()){
             if (!aroundCell)
                 continue;
 
@@ -127,6 +130,11 @@ class Monster {
 
             if (aroundCell.isEmptyCell())
                 aroundCell.is_earth = true;
+
+            counter++;
+
+            if (counter == max)
+                break;
         }
     }
 
