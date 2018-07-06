@@ -65,8 +65,8 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/functions.php";
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script src="https://unpkg.com/vue"></script>
+    <script src="<?=includeAssetFile( "/assets/js/plugins/jquery-3.3.1.slim.min.js" )?>"></script>
+    <script src="<?=includeAssetFile( "/assets/js/plugins/vue-2.5.16.min.js" )?>"></script>
     <script src="<?=includeAssetFile( "/assets/js/tools.js" )?>"></script>
     <script src="<?=includeAssetFile( "/assets/js/bomber_game.js" )?>"></script>
     <script src="<?=includeAssetFile( "/assets/js/bomber.vue.js" )?>"></script>
