@@ -132,6 +132,10 @@ class Monster {
         this.cell.$el.append('<i class="fab fa-d-and-d"></i>');
     }
 
+    explode(){
+        clearInterval(this.intervelId);
+    }
+
     walk(){
         let context = this;
 
@@ -142,10 +146,14 @@ class Monster {
             for (let cell of linearCells){
                 if (cell && cell.isEnterableCell()){
                     context.cell.is_monster = false;
+
                     cell.is_monster = true;
                     cell.monster = context;
+                    cell.enterMonster(context);
+
                     context.cell.render();
                     context.cell = cell;
+
                     cell.render();
 
                     break;
@@ -338,7 +346,12 @@ class Cell {
 
         this.is_exployed = true;
         this.is_earth = false;
-        this.is_monster = false;
+
+        if (this.is_monster) {
+            this.is_monster = false;
+            this.monster.explode();
+        }
+
         this.is_bomb = false;
         this.render();
 
@@ -374,6 +387,16 @@ class Cell {
         if (this.is_exployed){
             console.log("GAME OVER - you are exployed!");
             // TODO implement end of game
+        }
+    }
+
+    enterMonster(moster){
+        this.is_monster = true;
+        this.moster = moster;
+
+        if (this.is_exployed){
+            this.is_monster = false;
+            this.moster.explode();
         }
     }
 }
