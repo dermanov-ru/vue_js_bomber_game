@@ -68,14 +68,12 @@ class Bomb {
     }
 
     render(){
-        this.cell.$el.attr("class", "cell");
-
         if (this.timeout_seconds)  {
             this.cell.$el.addClass("bomb");
-            this.cell.$el.html('<i class="fas fa-bomb animated zoomIn">' + this.timeout_seconds + '</i>');
+            this.cell.$el.append('<i class="fas fa-bomb animated zoomIn bomb">' + this.timeout_seconds + '</i>');
         } else {
             this.cell.$el.addClass("explode");
-            this.cell.$el.html('<i class="fas fa-certificate animated zoomIn"></i></i>');
+            this.cell.$el.append('<i class="fas fa-certificate animated zoomIn"></i></i>');
         }
     }
 
@@ -84,7 +82,7 @@ class Bomb {
 
         this.intervelId = setInterval(function () {
             context.timeout_seconds--;
-            context.render();
+            context.cell.render();
 
             if (!context.timeout_seconds){
                 clearInterval(context.intervelId);
@@ -130,7 +128,7 @@ class Monster {
 
     render(){
         this.cell.$el.addClass("monster"); // TODO render few types
-        this.cell.$el.html('<i class="fab fa-d-and-d"></i>');
+        this.cell.$el.append('<i class="fab fa-d-and-d"></i>');
     }
 }
 
@@ -152,7 +150,7 @@ class Hero {
 
     render(){
         this.cell.$el.addClass("hero");
-        this.cell.$el.html('<i class="fas fa-user-astronaut"></i>');
+        this.cell.$el.append('<i class="fas fa-user-astronaut"></i>');
     }
 
     move_left(){
@@ -170,9 +168,9 @@ class Hero {
         this.cell.exit();
         this.cell.render();
 
-        cell.enter();
         this.cell = cell;
-        this.render();
+        cell.enter(this);
+        this.cell.render();
     }
 
     move_right(){
@@ -214,9 +212,10 @@ class Hero {
 
         this.bomb_count--;
 
-        this.cell.is_bomb = true;
         let bomb = new Bomb(this.cell, this.explode_power);
-        bomb.render();
+        this.cell.is_bomb = true;
+        this.cell.bomb = bomb;
+        this.cell.render();
 
         let ctx = this;
         bomb.startTimer(function () {
@@ -236,6 +235,9 @@ class Cell {
         this.around = null;
         this.is_bomb = false;
         this.is_exployed = false;
+
+        this.bomb = null;
+        this.hero = null;
     }
 
     clean(){
@@ -256,16 +258,24 @@ class Cell {
 
         else if (this.is_contain_exit_door) {
             this.$el.addClass("exit_door");
-            this.$el.html('<i class="fas fa-door-closed"></i>');
+            this.$el.append('<i class="fas fa-door-closed"></i>');
         }
 
         if (this.is_exit_door_open)
-            this.$el.html('<i class="fas fa-door-open"></i>');
+            this.$el.append('<i class="fas fa-door-open"></i>');
 
         if (this.is_exployed){
             this.clean();
             this.$el.addClass("explode");
-            this.$el.html('<i class="fas fa-certificate animated zoomIn"></i></i>');
+            this.$el.append('<i class="fas fa-certificate animated zoomIn"></i></i>');
+        }
+
+        if (this.is_bomb){
+            this.bomb.render();
+        }
+
+        if (this.is_hero){
+            this.hero.render();
         }
     }
 
@@ -318,8 +328,9 @@ class Cell {
         this.is_hero = false;
     }
 
-    enter(){
+    enter(hero){
         this.is_hero = true;
+        this.hero = hero;
 
         if (this.is_exit_door_open){
             console.log("YOU WIN - congratulations!");

@@ -63,11 +63,16 @@
     line-height: 25px;
     float: left;
     font-weight: bold;
+    position: relative;
 }
 
 .bomber_game .cell i{
     font-size: 25px;
     line-height: 50px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
 }
 
 .bomber_game .cell.hero {
@@ -76,6 +81,16 @@
 
 .bomber_game .cell.monster {
     color: red;
+}
+
+.bomber_game .bomb {
+    color: black;
+    z-index: 1;
+}
+.bomber_game .cell.hero .bomb {
+    font-size: 15px;
+    text-align: right;
+    line-height: 70px;
 }
 
 .bomber_game .cell.explode {
