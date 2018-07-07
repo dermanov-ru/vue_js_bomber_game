@@ -8,13 +8,14 @@
  */
 
 class BomberGameLevel {
-    constructor(field_size, monsters_count, hero_bombs_count, hero_explode_power, improver_bombs_count, improver_power_count) {
+    constructor(field_size, monsters_count, hero_bombs_count, hero_explode_power, improver_bombs_count, improver_power_count, lifes_power_count) {
         this.field_size = field_size;
         this.monsters_count = monsters_count;
         this.hero_bombs_count = hero_bombs_count;
         this.hero_explode_power = hero_explode_power;
         this.improver_bombs_count = improver_bombs_count;
         this.improver_power_count = improver_power_count;
+        this.lifes_power_count = lifes_power_count;
     }
 }
 
@@ -152,7 +153,24 @@ class BombImprover {
             return;
 
         this.cell.$el.addClass("bomb");
-        this.cell.$el.append('<i class="fas fa-bomb bomb_improver"></i>');
+        this.cell.$el.append('<i class="fas fa-bomb improver bomb_improver"> +1</i>');
+    }
+}
+
+class LifesImprover {
+    constructor(cell) {
+        this.cell = cell;
+    }
+
+    improveHero(hero){
+        hero.lifes_count++;
+    }
+
+    render(){
+        if (this.cell.is_earth)
+            return;
+
+        this.cell.$el.append('<i class="fas fa-user-astronaut improver hero_improver"> +1</i>');
     }
 }
 
@@ -169,7 +187,7 @@ class ExplodePowerImprover {
         if (this.cell.is_earth)
             return;
 
-        this.cell.$el.append('<i class="fas fa-certificate gold"></i></i>');
+        this.cell.$el.append('<i class="fas fa-certificate improver gold "> +1</i>');
     }
 }
 
@@ -352,7 +370,10 @@ class Hero {
         this.safe_zone = [];
         this.explode_power = 1;
         this.bomb_count = 1;
+        this.lifes_count = 1;
         this.is_locked = false;
+
+        // render states
         this.is_exployed = false;
         this.is_improved = false;
     }
@@ -599,8 +620,12 @@ class Cell {
         this.is_bomb = false;
 
         if (this.is_hero){
-            this.hero.is_exployed = true;
-            this.game.endGame(false);
+            this.hero.lifes_count--;
+
+            if (!this.hero.lifes_count){
+                this.hero.is_exployed = true;
+                this.game.endGame(false);
+            }
         }
 
         this.render();
@@ -617,8 +642,11 @@ class Cell {
 
         let context = this;
         setTimeout(function () {
+            if (!context.game.getHero().lifes_count){
+                context.is_hero = false;
+            }
+
             context.is_exployed = false;
-            context.is_hero = false;
             context.render();
         }, 700); // TODO extract timeout to config
     }
@@ -636,13 +664,21 @@ class Cell {
         }
 
         if (this.is_monster){
-            this.hero.is_exployed = true;
-            this.game.endGame(false);
+            this.hero.lifes_count--;
+
+            if (!this.hero.lifes_count){
+                this.hero.is_exployed = true;
+                this.game.endGame(false);
+            }
         }
 
         if (this.is_exployed){
-            this.hero.is_exployed = true;
-            this.game.endGame(false);
+            this.hero.lifes_count--;
+
+            if (!this.hero.lifes_count){
+                this.hero.is_exployed = true;
+                this.game.endGame(false);
+            }
         }
 
         if (this.improver){
@@ -663,8 +699,12 @@ class Cell {
         }
 
         if (this.is_hero){
-            this.hero.is_exployed = true;
-            this.game.endGame(false);
+            this.hero.lifes_count--;
+
+            if (!this.hero.lifes_count){
+                this.hero.is_exployed = true;
+                this.game.endGame(false);
+            }
         }
     }
 }
@@ -782,9 +822,11 @@ class BomberGame {
         }
     }
 
+    // TODO refactor function
     initImprovers(){
         let maxBombsImp = this.game_level.improver_bombs_count;
         let maxPowerImp = this.game_level.improver_power_count;
+        let lifes_power_count = this.game_level.lifes_power_count;
         let counter = 0;
         let cells = Tools.shuffle(this.cells);
 
@@ -808,6 +850,18 @@ class BomberGame {
                 continue;
 
             cell.improver = new ExplodePowerImprover(cell);
+            counter++;
+        }
+
+        counter = 0;
+        for (let cell of cells){
+            if (counter == lifes_power_count)
+                break;
+
+            if (!cell.is_earth || cell.is_contain_exit_door || cell.improver)
+                continue;
+
+            cell.improver = new LifesImprover(cell);
             counter++;
         }
     }

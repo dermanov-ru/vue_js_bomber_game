@@ -88,7 +88,7 @@
 }
 
 .bomber_game .cell.hero {
-    color: gold;
+    color: #28ad62;
 }
 
 .bomber_game .cell.monster {
@@ -99,7 +99,13 @@
     color: black;
     z-index: 1;
 }
+.bomber_game .improver {
+    font-size: 18px!important;
+}
 .bomber_game .bomb_improver {
+    color: black;
+}
+.bomber_game .hero_improver {
     color: #28ad62;
 }
 

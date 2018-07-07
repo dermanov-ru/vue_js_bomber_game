@@ -23,12 +23,13 @@ let BomberApp = new Vue({
     data: {
         level : null,
         levels : [
-            new BomberGameLevel(5, 5, 1, 1, 1, 0),
-            new BomberGameLevel(7, 7, 2, 1, 0, 1),
-            new BomberGameLevel(9, 9, 2, 1, 2, 1),
-            new BomberGameLevel(11, 11, 2, 2, 2, 1),
-            new BomberGameLevel(13, 13, 2, 2, 3, 2),
-            new BomberGameLevel(15, 15, 5, 5, 5, 5),
+            new BomberGameLevel(10, 1, 10, 10, 3, 3, 4), // TODO remove debug level
+            new BomberGameLevel(5, 5, 1, 1, 1, 0, 0),
+            new BomberGameLevel(7, 7, 2, 1, 0, 1, 1),
+            new BomberGameLevel(9, 9, 2, 1, 2, 1, 1),
+            new BomberGameLevel(11, 11, 2, 2, 2, 1, 2),
+            new BomberGameLevel(13, 13, 2, 2, 3, 2, 3),
+            new BomberGameLevel(15, 15, 5, 5, 5, 5, 5),
         ],
         bomber_game : null,
 
@@ -62,6 +63,12 @@ let BomberApp = new Vue({
                 return 0;
 
             return this.bomber_game.hero.explode_power;
+        },
+        lifes_count : function() {
+            if (!this.bomber_game)
+                return 0;
+
+            return this.bomber_game.hero.lifes_count;
         }
     },
     methods : {
