@@ -586,6 +586,9 @@ class Cell {
         if (this.is_wall)
             return;
 
+        if (!this.is_earth)
+            this.improver = null;
+
         this.is_exployed = true;
 
         if (this.is_monster) {
