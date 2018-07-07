@@ -99,6 +99,9 @@
     color: black;
     z-index: 1;
 }
+.bomber_game .bomb_improver {
+    color: #28ad62;
+}
 
 .bomber_game .cell.hero .bomb {
     font-size: 15px;

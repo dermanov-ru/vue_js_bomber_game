@@ -152,7 +152,7 @@ class BombImprover {
             return;
 
         this.cell.$el.addClass("bomb");
-        this.cell.$el.append('<i class="fas fa-bomb green bomb"></i>');
+        this.cell.$el.append('<i class="fas fa-bomb bomb_improver"></i>');
     }
 }
 
