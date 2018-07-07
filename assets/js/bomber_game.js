@@ -7,6 +7,17 @@
  *
  */
 
+class BomberGameLevel {
+    constructor(field_size, monsters_count, hero_bombs_count, hero_explode_power, improver_bombs_count, improver_power_count) {
+        this.field_size = field_size;
+        this.monsters_count = monsters_count;
+        this.hero_bombs_count = hero_bombs_count;
+        this.hero_explode_power = hero_explode_power;
+        this.improver_bombs_count = improver_bombs_count;
+        this.improver_power_count = improver_power_count;
+    }
+}
+
 class Around {
     /*
     * around_cells_matrix - not contain current cell!
@@ -654,14 +665,15 @@ class Cell {
 }
 
 class BomberGame {
-    constructor(game_field_size){
-        this.game_field_size = game_field_size;
+    constructor(game_level){
+        this.game_level = game_level;
+        this.game_field_size = game_level.field_size;
         this.cells = [];
         this.walls = [];
         this.exit_door = null;
         this.hero = null;
 
-        this.basic_monster_count = game_field_size; // TODO get from game level param
+        this.basic_monster_count = game_level.monsters_count;
         this.alive_monster_count = 0;
         this.monsters = [];
 
@@ -715,6 +727,8 @@ class BomberGame {
         let heroCell = this.cells[ 0 ];
 
         this.hero = new Hero(heroCell);
+        this.hero.explode_power = this.game_level.hero_explode_power;
+        this.hero.bomb_count = this.game_level.hero_bombs_count;
         this.hero.safe_zone = Tools.sub_matrix(this.cells, this.game_field_size, 3, 0);
 
         heroCell.is_hero = true;
@@ -764,32 +778,32 @@ class BomberGame {
     }
 
     initImprovers(){
-        let maxBombsImp = 1; // TODO get from level config
-        let maxPowerImp = 1; // TODO get from level config
+        let maxBombsImp = this.game_level.improver_bombs_count;
+        let maxPowerImp = this.game_level.improver_power_count;
         let counter = 0;
         let cells = Tools.shuffle(this.cells);
 
         for (let cell of cells){
+            if (counter == maxBombsImp)
+                break;
+
             if (!cell.is_earth || cell.is_contain_exit_door || cell.improver)
                 continue;
 
             cell.improver = new BombImprover(cell);
             counter++;
-
-            if (counter == maxBombsImp)
-                break;
         }
 
         counter = 0;
         for (let cell of cells){
+            if (counter == maxPowerImp)
+                break;
+
             if (!cell.is_earth || cell.is_contain_exit_door || cell.improver)
                 continue;
 
             cell.improver = new ExplodePowerImprover(cell);
             counter++;
-
-            if (counter == maxPowerImp)
-                break;
         }
     }
 

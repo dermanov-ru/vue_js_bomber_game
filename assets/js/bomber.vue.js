@@ -21,43 +21,14 @@ let BomberApp = new Vue({
         this.init_gamepad_control();
     },
     data: {
-        level : {},
+        level : null,
         levels : [
-            {
-                title : "1",
-                field_size : 5,
-                monster_count : 5,
-                bombs_count : 1,
-                explode_power : 1,
-            },
-            {
-                title : "2",
-                field_size : 7,
-                monster_count : 7,
-                bombs_count : 2,
-                explode_power : 1,
-            },
-            {
-                title : "3",
-                field_size : 9,
-                monster_count : 9,
-                bombs_count : 2,
-                explode_power : 1,
-            },
-            {
-                title : "4",
-                field_size : 11,
-                monster_count : 11,
-                bombs_count : 2,
-                explode_power : 1,
-            },
-            {
-                title : "5",
-                field_size : 13,
-                monster_count : 13,
-                bombs_count : 2,
-                explode_power : 1,
-            }
+            new BomberGameLevel(5, 5, 1, 1, 1, 0),
+            new BomberGameLevel(7, 7, 2, 1, 0, 1),
+            new BomberGameLevel(9, 9, 2, 1, 2, 1),
+            new BomberGameLevel(11, 11, 2, 2, 2, 1),
+            new BomberGameLevel(13, 13, 2, 2, 3, 2),
+            new BomberGameLevel(15, 15, 5, 5, 5, 5),
         ],
         bomber_game : null,
 
@@ -112,7 +83,7 @@ let BomberApp = new Vue({
             if (this.bomber_game)
                 this.bomber_game.destroy();
 
-            this.bomber_game = new BomberGame(this.level.field_size, this.level.monster_count );
+            this.bomber_game = new BomberGame(this.level);
             this.bomber_game.initGame( $(".bomber_game .cell") );
             this.bomber_game.on_game_end_callback = this.game_end;
         },

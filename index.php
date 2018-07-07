@@ -40,17 +40,17 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/functions.php";
             </div>
 
             <div class="bomber_game_status_bar" >
-                <div class="bomber_game_status_bar_item" title="Уровень игры"><i class="fas fa-signal"></i> {{level.title}}</div>
+                <div class="bomber_game_status_bar_item" title="Уровень игры"><i class="fas fa-signal"></i> {{levels.indexOf(level) + 1}} / {{levels.length}} </div>
                 <div class="bomber_game_status_bar_item" title="Время игры"><i class="far fa-clock"></i> {{game_time_formated}}</div>
                 <div class="bomber_game_status_bar_item" title="Осталось взорвать монстров"><i class="fab fa-d-and-d red"></i> {{monsters_count}}</div>
                 <div class="bomber_game_status_bar_item" title="Мощность взрыва"><i class="fas fa-certificate gold"></i> {{explode_power}}</div>
                 <div class="bomber_game_status_bar_item" title="Количество бомб"><i class="fas fa-bomb"></i> {{bombs_count}}</div>
             </div>
 
-            <div class="bomber_game_table">
-                <template  v-for="bomber_game_status_bar_item in level.field_size">
+            <div class="bomber_game_table" v-if="level">
+                <template v-for="row in level.field_size">
                     <div class="bomber_game_row">
-                        <div v-for="bomber_game_status_bar_item1 in level.field_size" class="cell"></div>
+                        <div v-for="cell in level.field_size" class="cell"></div>
                     </div>
                 </template>
             </div>
