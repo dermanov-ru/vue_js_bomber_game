@@ -609,9 +609,11 @@ class Cell {
             this.is_exit_door_open = false;
         }
 
+        // allow next near placed bomb to explode next linear earth cell
+        this.is_earth = false;
+
         let context = this;
         setTimeout(function () {
-            context.is_earth = false;
             context.is_exployed = false;
             context.is_hero = false;
             context.render();
