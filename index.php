@@ -33,19 +33,19 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/functions.php";
                 <div class="bomber_game_status_bar_item" title="">Игра «Бомбер»</div>
             </div>
 
-            <div class="bomber_game_status_bar" >
-                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="restart_game" >Restart game</a>
-                <div class="bomber_game_status_bar_item bomber_game_status_bar_item_sep">|</div>
-                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="restart_game" >Restart level</a>
-            </div>
+<!--            <div class="bomber_game_status_bar" >-->
+<!--                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="restart_game" >Restart game</a>-->
+<!--                <div class="bomber_game_status_bar_item bomber_game_status_bar_item_sep">|</div>-->
+<!--                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="restart_game" >Restart level</a>-->
+<!--            </div>-->
 
             <div class="bomber_game_status_bar" v-if="level">
                 <div class="bomber_game_status_bar_item" title="Уровень игры"><i class="fas fa-signal"></i> {{levels.indexOf(level) + 1}} / {{levels.length}} </div>
                 <div class="bomber_game_status_bar_item" title="Время игры"><i class="far fa-clock"></i> {{game_time_formated}}</div>
                 <div class="bomber_game_status_bar_item" title="Осталось взорвать монстров"><i class="fab fa-d-and-d red"></i> {{monsters_count}}</div>
                 <div class="bomber_game_status_bar_item" title="Количество жизней (может съесть монстр или взорваться)"><i class="fas fa-user-astronaut green"></i> {{lifes_count}}</div>
-                <div class="bomber_game_status_bar_item" title="Мощность взрыва"><i class="fas fa-certificate gold"></i> {{explode_power}} / {{explode_power + level.improver_power_count}}</div>
-                <div class="bomber_game_status_bar_item" title="Количество бомб"><i class="fas fa-bomb"></i> {{bombs_count}} / {{bombs_count + level.improver_bombs_count}}</div>
+                <div class="bomber_game_status_bar_item" title="Мощность взрыва"><i class="fas fa-certificate gold"></i> {{explode_power}}</div>
+                <div class="bomber_game_status_bar_item" title="Количество бомб"><i class="fas fa-bomb"></i> {{bombs_count}}</div>
             </div>
 
             <div class="bomber_game_table" v-if="level">
@@ -54,6 +54,12 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/functions.php";
                         <div v-for="cell in level.field_size" class="cell"></div>
                     </div>
                 </template>
+            </div>
+
+            <div class="bomber_game_status_bar"  v-if="message">
+                <div class="bomber_game_status_bar_item">{{message}}</div>
+                <div class="bomber_game_status_bar_item bomber_game_status_bar_item_sep"> - </div>
+                <a class="bomber_game_status_bar_item green" href="#" @click.prevent="restart_game">Esc - начать с начала</a>
             </div>
 
             <div class="bomber_game_status_bar" >

@@ -23,7 +23,7 @@ let BomberApp = new Vue({
     data: {
         level : null,
         levels : [
-            new BomberGameLevel(10, 1, 10, 10, 3, 3, 4), // TODO remove debug level
+            // new BomberGameLevel(10, 1, 10, 10, 3, 3, 4), // TODO remove debug level
             new BomberGameLevel(5, 5, 1, 1, 1, 0, 0),
             new BomberGameLevel(7, 7, 2, 1, 0, 1, 1),
             new BomberGameLevel(9, 9, 2, 1, 2, 1, 1),
@@ -35,6 +35,7 @@ let BomberApp = new Vue({
 
         game_time_seconds : 0,
         timer : 0,
+        message : 0,
     },
     computed : {
         game_time_formated : function () {
@@ -93,6 +94,8 @@ let BomberApp = new Vue({
             this.bomber_game = new BomberGame(this.level);
             this.bomber_game.initGame( $(".bomber_game .cell") );
             this.bomber_game.on_game_end_callback = this.game_end;
+
+            this.message = "";
         },
         restart_game : function () {
             this.start_game();
@@ -106,6 +109,7 @@ let BomberApp = new Vue({
                 this.start_next_level();
             }  else {
                 // TODO show message
+                this.message = "Вы проиграли!";
                 this.stop_timer();
             }
         },
@@ -116,6 +120,7 @@ let BomberApp = new Vue({
 
             if (!nextLevel){
                 // TODO show user message
+                this.message = "Вы прошли всю игру!";
                 console.log("YOU WIN AT ALL GAME!");
                 return;
             }
@@ -186,6 +191,7 @@ let BomberApp = new Vue({
                 }
                 // escape
                 if (event.keyCode == 27) {
+                    ctx.level = ctx.levels[ 0 ];
                     ctx.restart_game();
                     event.preventDefault();
                 }
