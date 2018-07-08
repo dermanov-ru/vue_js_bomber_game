@@ -191,7 +191,6 @@ let BomberApp = new Vue({
                 }
                 // escape
                 if (event.keyCode == 27) {
-                    ctx.level = ctx.levels[ 0 ];
                     ctx.restart_game();
                     event.preventDefault();
                 }
