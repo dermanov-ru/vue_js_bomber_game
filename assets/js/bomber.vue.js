@@ -23,7 +23,7 @@ let BomberApp = new Vue({
     data: {
         level : null,
         levels : [
-            // new BomberGameLevel(10, 1, 10, 10, 3, 3, 4), // TODO remove debug level
+            new BomberGameLevel(9, 1, 10, 10, 3, 3, 4), // TODO remove debug level
             new BomberGameLevel(5, 5, 1, 1, 1, 0, 0),
             new BomberGameLevel(7, 7, 2, 1, 0, 1, 1),
             new BomberGameLevel(9, 9, 2, 1, 2, 1, 1),

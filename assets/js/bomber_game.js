@@ -386,9 +386,15 @@ class Hero {
         return this.safe_zone.indexOf(cell) > -1
     }
 
+    render_getColor(){
+        return "green";
+    }
+
     render(){
         this.cell.$el.addClass("hero");
-        this.cell.$el.append('<i class="fas fa-user-astronaut hero"></i>');
+
+        let color = this.render_getColor();
+        this.cell.$el.append('<i class="fas fa-user-astronaut hero ' + color + '"></i>');
 
         if (this.is_exployed){
             this.animateExplode();
@@ -500,6 +506,23 @@ class Hero {
             ctx.bomb_count++;
         });
     }
+}
+
+class Bot extends Hero{
+    render_getColor(){
+        return "blue";
+    }
+
+    goWalk(){
+        /*
+        * search paths
+        * sort paths by relevant
+        * go
+        * place bomb
+        * hide from bomb
+        * */
+    }
+
 }
 
 class Cell {
@@ -733,6 +756,7 @@ class BomberGame {
         this.initEarth();
         this.initExitDoor();
         this.initImprovers();
+        this.initBots();
 
         this.renderGame();
     }
@@ -780,6 +804,22 @@ class BomberGame {
         heroCell.hero = this.hero;
     }
 
+    initBots(){
+        let heroCell = Tools.get_corner_cell(this.cells, this.game_level.field_size, 4);
+        console.log('heroCell', heroCell);
+
+        let bot  = new Bot(heroCell);
+        bot.explode_power = this.game_level.hero_explode_power;
+        bot.bomb_count = this.game_level.hero_bombs_count;
+        // bot.safe_zone = Tools.sub_matrix(this.cells, this.game_field_size, -3, 0); // TODO
+        // console.log('this.hero.safe_zone', this.hero.safe_zone);
+
+        heroCell.is_hero = true;
+        heroCell.hero = bot;
+
+        bot.goWalk();
+    }
+
     initWalls(){
         let wallsSubMatrixSize = this.game_field_size - 2;
         let sub_matrix = Tools.sub_matrix(this.cells, this.game_field_size, wallsSubMatrixSize, 1);
@@ -814,6 +854,7 @@ class BomberGame {
             if (!cell.isEmptyCell())
                 continue;
 
+            // TODO check bots linear cell
             if (this.hero.isLinearCell(cell))
                 continue;
 
