@@ -521,8 +521,116 @@ class Bot extends Hero{
         * place bomb
         * hide from bomb
         * */
+
+        let ways = this.scan_ways();
+        let best_way = ways.get_best_way();
+        this.walk(best_way);
     }
 
+    scan_ways(){
+        let ways = new BotWalkWaysCollection();
+
+        // 1 - top, 2- right, - 3 bottom, 4 - left
+        let directions = ["top_cell", "right_cell", "bottom_cell", "left_cell"];
+
+        for (let direction of directions){
+            let way_first_cell = this.cell.around[ direction ];
+
+            if (!way_first_cell)
+                continue;
+
+            let way = this.scan_way(way_first_cell, direction);
+            ways.add_way( way );
+        }
+
+        console.log('ways', ways);
+        return ways;
+    }
+
+    scan_way(way_first_cell, direction){
+        let way = new BotWalkWay(direction);
+
+        if (!way_first_cell.isEnterableCell())
+            return way;
+
+        way.cells.push(way_first_cell);
+
+        while (true){
+            let way_next_cell = way_first_cell.around[ direction ];
+            way_first_cell = way_next_cell;
+
+            if (!way_next_cell)
+                break;
+
+            if (!way_next_cell.isEnterableCell())
+                break;
+
+            way.cells.push(way_next_cell);
+        }
+
+        return way;
+    }
+
+    walk(way){
+        let ctx = this;
+        let cell = way.cells.shift();
+        ctx.enter_cell(cell);
+
+        // for (let cell of way.cells){
+        if (way.cells.length)
+            setTimeout(function () {
+                ctx.walk(way);
+            }, 700); // TODO get bot speed from config
+        // }
+    }
+}
+
+class BotWalkWaysCollection {
+    constructor() {
+        this.ways = [];
+    }
+
+    add_way(way){
+        this.ways.push(way);
+    }
+
+    get_best_way(){
+        let ranks = [];
+        let best_rank = -999;
+        let best_way = null;
+
+        for (let way of this.ways){
+            // let rank = ranks.push( way.get_rank() );
+            let rank = way.get_rank();
+
+            if (rank > best_rank){
+                best_rank = rank;
+                best_way = way;
+            }
+        }
+
+        console.log('best_way', best_way);
+        return best_way;
+    }
+}
+
+class BotWalkWay {
+    constructor(direction) {
+        this.direction = direction;
+        this.cells = [];
+        this.is_bomb = false;
+        this.is_hero = false;
+        this.is_monster = false;
+        this.is_improver = false;
+    }
+
+    get_rank(){
+        let rank = 0;
+
+        rank += this.cells.length;
+
+        return rank;
+    }
 }
 
 class Cell {
@@ -817,7 +925,10 @@ class BomberGame {
         heroCell.is_hero = true;
         heroCell.hero = bot;
 
-        bot.goWalk();
+        // wait some tim
+        setTimeout(function () {
+            bot.goWalk();
+        }, 1000);
     }
 
     initWalls(){
