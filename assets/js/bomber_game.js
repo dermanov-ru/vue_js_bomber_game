@@ -522,19 +522,68 @@ class Bot extends Hero{
         * hide from bomb
         * */
 
-        let ways = this.scan_ways();
+        let ways = new BotWalkWaysCollection();
+        ways = ways.scan_ways(this.cell);
         let best_way = ways.get_best_way();
         this.walk(best_way);
     }
 
-    scan_ways(){
+    walk(way){
+        let ctx = this;
+        // let cell = way.cells.shift();
+        let cell = way.cells[0];
+        way.visit(cell);
+        way.scan_sub_ways(cell);
+        ctx.enter_cell(cell);
+
+            setTimeout(function () {
+                ctx.goWalk();
+            }, 3000); // TODO get bot speed from config
+
+        // if (way.cells.length)
+        //     setTimeout(function () {
+        //         ctx.walk(way);
+        //     }, 700); // TODO get bot speed from config
+    }
+}
+
+class BotWalkWaysCollection {
+    constructor() {
+        this.ways = [];
+    }
+
+    add_way(way){
+        this.ways.push(way);
+    }
+
+    get_best_way(){
+        let ranks = [];
+        let best_rank = -999;
+        let best_way = null;
+
+        for (let way of this.ways){
+            // let rank = ranks.push( way.get_rank() );
+            let rank = way.get_rank();
+
+            if (rank > best_rank){
+                best_rank = rank;
+                best_way = way;
+            }
+        }
+
+        console.log('best_way', best_way);
+        return best_way;
+    }
+
+
+    scan_ways(cell){
         let ways = new BotWalkWaysCollection();
 
         // 1 - top, 2- right, - 3 bottom, 4 - left
         let directions = ["top_cell", "right_cell", "bottom_cell", "left_cell"];
 
         for (let direction of directions){
-            let way_first_cell = this.cell.around[ direction ];
+            let way_first_cell = cell.around[ direction ];
 
             if (!way_first_cell)
                 continue;
@@ -571,46 +620,15 @@ class Bot extends Hero{
         return way;
     }
 
-    walk(way){
-        let ctx = this;
-        let cell = way.cells.shift();
-        ctx.enter_cell(cell);
-
-        // for (let cell of way.cells){
-        if (way.cells.length)
-            setTimeout(function () {
-                ctx.walk(way);
-            }, 700); // TODO get bot speed from config
-        // }
-    }
-}
-
-class BotWalkWaysCollection {
-    constructor() {
-        this.ways = [];
-    }
-
-    add_way(way){
-        this.ways.push(way);
-    }
-
-    get_best_way(){
-        let ranks = [];
-        let best_rank = -999;
-        let best_way = null;
+    get_all_ways_cells(){
+        let result = [];
 
         for (let way of this.ways){
-            // let rank = ranks.push( way.get_rank() );
-            let rank = way.get_rank();
-
-            if (rank > best_rank){
-                best_rank = rank;
-                best_way = way;
-            }
+            result.splice(0,0, way.cells);
         }
 
-        console.log('best_way', best_way);
-        return best_way;
+        console.log('get_all_ways_cells', get_all_ways_cells);
+        return result;
     }
 }
 
@@ -622,12 +640,28 @@ class BotWalkWay {
         this.is_hero = false;
         this.is_monster = false;
         this.is_improver = false;
+
+        this.visited_cells = [];
+        this.sub_ways = [];
+    }
+
+    visit(cell) {
+        this.visited_cells.push(cell);
+    }
+
+    scan_sub_ways(cell) {
+        let ways = new BotWalkWaysCollection();
+        ways = ways.scan_ways(cell);
+
+        this.sub_ways = ways;
     }
 
     get_rank(){
         let rank = 0;
 
         rank += this.cells.length;
+
+        // let get_all_ways_cells()
 
         return rank;
     }
