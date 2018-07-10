@@ -60,6 +60,14 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/functions.php";
             <div class="bomber_game_status_bar_item bomber_game_status_bar_item_sep">|</div>
             <a class="bomber_game_status_bar_item orange" href="https://github.com/dermanov-ru/vue_js_bomber_game" target="_blank" >Fork me on GitHub</a>
         </div>
+        
+        <div class="bomber_mobile_gamepad">
+            <div class="bomber_mobile_gamepad_item bomber_mobile_gamepad_item__top" @click="move_top"></div>
+            <div class="bomber_mobile_gamepad_item bomber_mobile_gamepad_item__left" @click="move_left"></div>
+            <div class="bomber_mobile_gamepad_item bomber_mobile_gamepad_item__right" @click="move_right"></div>
+            <div class="bomber_mobile_gamepad_item bomber_mobile_gamepad_item__bottom" @click="move_bottom"></div>
+            <div class="bomber_mobile_gamepad_item bomber_mobile_gamepad_item__place_bomb" @click="place_bomb"><i class="fas fa-bomb"></i></div>
+        </div>
     </div>
 
     <script src="<?=includeAssetFile( "/assets/js/plugins/jquery-3.3.1.slim.min.js" )?>"></script>

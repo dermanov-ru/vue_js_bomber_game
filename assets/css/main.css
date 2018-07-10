@@ -149,3 +149,76 @@
     right: 0%;
     left: auto;
 }
+
+.bomber_mobile_gamepad{
+
+    position: absolute;
+
+    width: 100%;
+
+    /* background: red; */
+
+    bottom: 0;
+
+    height: 100px;
+
+    opacity: 0.15;
+}
+
+.bomber_mobile_gamepad_item{
+
+    width: 50px;
+
+    height: 50px;
+
+    background: green;
+
+    position: absolute;
+
+    border-radius: 50px;
+}
+
+.bomber_mobile_gamepad_item.bomber_mobile_gamepad_item__top{
+
+    left: 43px;
+
+    top: 0;
+}
+
+.bomber_mobile_gamepad_item.bomber_mobile_gamepad_item__right{
+
+    left: 85px;
+
+    top: 25px;
+}
+
+.bomber_mobile_gamepad_item.bomber_mobile_gamepad_item__bottom{
+
+    left: 43px;
+
+    top: 50px;
+}
+
+.bomber_mobile_gamepad_item.bomber_mobile_gamepad_item__left{
+
+    left: 0;
+
+    top: 25px;
+}
+
+.bomber_mobile_gamepad_item.bomber_mobile_gamepad_item__place_bomb{
+
+    right: 0px;
+
+    top: 24px;
+
+    width: 150px;
+
+    text-align: center;
+
+    font-size: 30px;
+
+    line-height: 50px;
+
+    color: black;
+}
