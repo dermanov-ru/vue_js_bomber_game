@@ -164,6 +164,7 @@
     height: 100px;
 
     opacity: 0.15;
+    touch-action: manipulation;
 }
 
 .bomber_mobile_gamepad_item{
