@@ -36,6 +36,9 @@ let BomberApp = new Vue({
         game_time_seconds : 0,
         timer : 0,
         message : 0,
+        game_started : false,
+        game_over : false,
+        show_mobile_gamepad : false,
     },
     computed : {
         game_time_formated : function () {
@@ -96,6 +99,8 @@ let BomberApp = new Vue({
             this.bomber_game.on_game_end_callback = this.game_end;
 
             this.message = "";
+            this.game_over = false;
+            this.game_started = true;
         },
         restart_game : function () {
             this.start_game();
@@ -108,8 +113,8 @@ let BomberApp = new Vue({
             if (is_win){
                 this.start_next_level();
             }  else {
-                // TODO show message
                 this.message = "Вы проиграли!";
+                this.game_over = true;
                 this.stop_timer();
             }
         },
@@ -119,9 +124,8 @@ let BomberApp = new Vue({
             let nextLevel = this.levels[ oldLevel + 1 ];
 
             if (!nextLevel){
-                // TODO show user message
                 this.message = "Вы прошли всю игру!";
-                console.log("YOU WIN AT ALL GAME!");
+                this.game_over = true;
                 return;
             }
 
@@ -154,10 +158,10 @@ let BomberApp = new Vue({
         },
 
         init_gamepad_control(){
-            // TODO if mobile
-            // this.initMobileGamePad();
-            // else
-            this.initDesktopGamePad();
+            if (Tools.is_mobil_device())
+                this.initMobileGamePad();
+            else
+                this.initDesktopGamePad();
         },
 
         initDesktopGamePad : function () {
@@ -195,6 +199,9 @@ let BomberApp = new Vue({
                     event.preventDefault();
                 }
             });
+        },
+        initMobileGamePad : function () {
+            this.show_mobile_gamepad = true;
         }
 
     },

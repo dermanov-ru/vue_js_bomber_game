@@ -35,6 +35,7 @@
     text-align: center;
     max-width: 800px;
     margin: 0 auto;
+    min-width: 500px;
 }
 
 .bomber_game_status_bar {
