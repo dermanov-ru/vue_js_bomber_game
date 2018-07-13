@@ -18,6 +18,7 @@ let BomberApp = new Vue({
             this.restart_game();
         });
 
+        this.mobile_mode = Tools.is_mobil_device();
         this.init_gamepad_control();
     },
     data: {
@@ -38,6 +39,7 @@ let BomberApp = new Vue({
         message : 0,
         game_started : false,
         game_over : false,
+        mobile_mode : false,
         show_mobile_gamepad : false,
     },
     computed : {
@@ -110,12 +112,25 @@ let BomberApp = new Vue({
         },
 
         game_end : function(is_win){
-            if (is_win){
-                this.start_next_level();
-            }  else {
-                this.message = "Вы проиграли!";
-                this.game_over = true;
-                this.stop_timer();
+            if (this.mobile_mode){
+                if (is_win){
+                    this.start_next_level();
+                }  else {
+
+                    // wait end of user enter animation
+                    let ctx = this;
+                    setTimeout(function () {
+                        ctx.restart_game();
+                    }, 1000);
+                }
+            } else {
+                if (is_win){
+                    this.start_next_level();
+                }  else {
+                    this.message = "Вы проиграли!";
+                    this.game_over = true;
+                    this.stop_timer();
+                }
             }
         },
 
@@ -158,7 +173,7 @@ let BomberApp = new Vue({
         },
 
         init_gamepad_control(){
-            if (Tools.is_mobil_device())
+            if (this.mobile_mode)
                 this.initMobileGamePad();
             else
                 this.initDesktopGamePad();
