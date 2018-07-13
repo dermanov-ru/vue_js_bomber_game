@@ -711,8 +711,17 @@ class Bot extends Hero{
                 return;
             }
 
-            if (cell.isEnterableForMonster()){
+            if (cell.isEnterableCell()){
                 context.enter_cell(cell);
+
+                /*
+                *
+                * */
+                let ways = new BotWalkWaysCollection();
+                ways = ways.scan_ways(cell);
+                let best_way = ways.get_best_way();
+                console.log('best_way', cell.$el[0], best_way);
+
                 // context.cell.is_monster = false;
                 //
                 // cell.is_monster = true;
@@ -731,7 +740,7 @@ class Bot extends Hero{
                 context.changeWalkDirection(context.walk_direction);
             }
 
-        }, 700); // TODO get from config
+        }, 450 * 10); // TODO get from config
     }
 }
 
@@ -845,13 +854,39 @@ class BotWalkWay {
     }
 
     get_rank(){
+        if (!this.cells.length)
+            return -1000;
+
         let rank = 0;
 
-        rank += this.cells.length;
+        rank -= this.cells.length;
+
+        // if (this.is_target_cell(this.cells[ this.cells.length - 1 ]))
+        //     rank += 2;
+
+        let end_path_cell = this.cells[ this.cells.length - 1 ];
+        rank += this.is_earth_around(end_path_cell);
+        // rank += this.is_improver_around(end_path_cell);
+
+        // for (let cell of this.cells){
+        //
+        // }
 
         // let get_all_ways_cells()
 
         return rank;
+    }
+
+    is_earth_around(cell){
+        let aroundCells = cell.around.getLinearAroundCells(1);
+        let result = 0;
+
+        for (let cell of aroundCells){
+            if (cell.is_earth)
+                result += 2;
+        }
+
+        return result;
     }
 }
 
