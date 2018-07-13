@@ -364,6 +364,98 @@ class Monster {
     }
 }
 
+class Walkable {
+    constructor(game, cell) {
+        this.game = game;
+        this.cell = cell;
+        this.intervelId = 0;
+        this.walk_direction = "none";
+        this.walk_steps_count = 1;
+    }
+
+    resetWalkStepsCount(){
+        this.walk_steps_count = Tools.random(1, 10);
+    }
+
+    changeWalkDirection(oldDirection){
+        this.walk_direction = Tools.shuffle(["left", "right", "top", "bottom"]).pop();
+
+        if (this.walk_direction == oldDirection){
+            this.changeWalkDirection(oldDirection);
+            return;
+        }
+
+        this.resetWalkStepsCount();
+    }
+
+    changeWalkDirectionLinear(oldDirection){
+        let linearDirections = {
+            "left" : "right",
+            "top" : "bottom",
+            "right" : "left",
+            "bottom" : "top"
+        }
+
+        this.walk_direction = linearDirections[ oldDirection ];
+        this.resetWalkStepsCount();
+    }
+
+    stopWalk(){
+        clearInterval(this.intervelId);
+    }
+
+    walk(){
+        let context = this;
+
+        this.changeWalkDirection();
+
+        this.intervelId = setInterval(function () {
+            let around = context.cell.around;
+            let cell;
+
+            switch (context.walk_direction){
+                case "top":
+                    cell = around.top_cell;
+                    break;
+                case "left":
+                    cell = around.left_cell;
+                    break;
+                case "right":
+                    cell = around.right_cell;
+                    break;
+                case "bottom":
+                    cell = around.bottom_cell;
+                    break;
+            }
+
+            if (!cell){
+                context.changeWalkDirection(context.walk_direction);
+                return;
+            }
+
+            if (cell.isEnterableForMonster()){
+                context.cell.is_monster = false;
+
+                cell.is_monster = true;
+                cell.monster = context;
+                cell.enterMonster(context);
+
+                context.cell.render();
+                context.cell = cell;
+
+                cell.render();
+
+                context.walk_steps_count--;
+                if (!context.walk_steps_count)
+                    context.changeWalkDirection(context.walk_direction);
+            } else {
+                context.changeWalkDirection(context.walk_direction);
+            }
+
+        }, 700); // TODO get from config
+    }
+}
+
 class Hero {
     constructor(cell) {
         this.cell = cell;
@@ -509,6 +601,16 @@ class Hero {
 }
 
 class Bot extends Hero{
+    constructor(cell){
+        // parent.constructor(cell)
+        super(cell);
+
+        // this.game = game;
+        // this.cell = cell;
+        this.intervelId = 0;
+        this.walk_direction = "none";
+        this.walk_steps_count = 1;
+    }
     render_getColor(){
         return "blue";
     }
@@ -522,28 +624,114 @@ class Bot extends Hero{
         * hide from bomb
         * */
 
-        let ways = new BotWalkWaysCollection();
-        ways = ways.scan_ways(this.cell);
-        let best_way = ways.get_best_way();
-        this.walk(best_way);
+        // let ways = new BotWalkWaysCollection();
+        // ways = ways.scan_ways(this.cell);
+        // let best_way = ways.get_best_way();
+        // this.walk(best_way);
+
+        this.walk();
     }
 
-    walk(way){
-        let ctx = this;
-        // let cell = way.cells.shift();
-        let cell = way.cells[0];
-        way.visit(cell);
-        way.scan_sub_ways(cell);
-        ctx.enter_cell(cell);
-
-            setTimeout(function () {
-                ctx.goWalk();
-            }, 3000); // TODO get bot speed from config
-
-        // if (way.cells.length)
+    scan(way){
+        // let ctx = this;
+        // // let cell = way.cells.shift();
+        // let cell = way.cells[0];
+        // way.visit(cell);
+        // way.scan_sub_ways(cell);
+        // ctx.enter_cell(cell);
+        //
         //     setTimeout(function () {
-        //         ctx.walk(way);
-        //     }, 700); // TODO get bot speed from config
+        //         ctx.goWalk();
+        //     }, 3000); // TODO get bot speed from config
+        //
+        // // if (way.cells.length)
+        // //     setTimeout(function () {
+        // //         ctx.walk(way);
+        // //     }, 700); // TODO get bot speed from config
+    }
+
+
+    resetWalkStepsCount(){
+        this.walk_steps_count = Tools.random(1, 10);
+    }
+
+    changeWalkDirection(oldDirection){
+        this.walk_direction = Tools.shuffle(["left", "right", "top", "bottom"]).pop();
+
+        if (this.walk_direction == oldDirection){
+            this.changeWalkDirection(oldDirection);
+            return;
+        }
+
+        this.resetWalkStepsCount();
+    }
+
+    changeWalkDirectionLinear(oldDirection){
+        let linearDirections = {
+            "left" : "right",
+            "top" : "bottom",
+            "right" : "left",
+            "bottom" : "top"
+        }
+
+        this.walk_direction = linearDirections[ oldDirection ];
+        this.resetWalkStepsCount();
+    }
+
+    stopWalk(){
+        clearInterval(this.intervelId);
+    }
+
+    walk(){
+        let context = this;
+
+        this.changeWalkDirection();
+
+        this.intervelId = setInterval(function () {
+            let around = context.cell.around;
+            let cell;
+
+            switch (context.walk_direction){
+                case "top":
+                    cell = around.top_cell;
+                    break;
+                case "left":
+                    cell = around.left_cell;
+                    break;
+                case "right":
+                    cell = around.right_cell;
+                    break;
+                case "bottom":
+                    cell = around.bottom_cell;
+                    break;
+            }
+
+            if (!cell){
+                context.changeWalkDirection(context.walk_direction);
+                return;
+            }
+
+            if (cell.isEnterableForMonster()){
+                context.enter_cell(cell);
+                // context.cell.is_monster = false;
+                //
+                // cell.is_monster = true;
+                // cell.monster = context;
+                // cell.enterMonster(context);
+
+                // context.cell.render();
+                // context.cell = cell;
+
+                // cell.render();
+
+                context.walk_steps_count--;
+                if (!context.walk_steps_count)
+                    context.changeWalkDirection(context.walk_direction);
+            } else {
+                context.changeWalkDirection(context.walk_direction);
+            }
+
+        }, 700); // TODO get from config
     }
 }
 
