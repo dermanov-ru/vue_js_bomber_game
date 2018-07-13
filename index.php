@@ -15,7 +15,7 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/functions.php";
 <head>
     <title>Игра «Бомбер» на vue.js</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=500">
+    <meta name="viewport" content="width=device-width">
 <!--    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />-->
 
     <meta property="og:title" content='Игра «Бомбер» на vue.js' />
