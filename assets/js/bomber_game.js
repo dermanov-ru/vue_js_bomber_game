@@ -576,7 +576,7 @@ class Hero {
         }
     }
 
-    place_bomb(){
+    place_bomb(after_explode_callback){
         if (this.is_locked)
             return;
 
@@ -596,6 +596,9 @@ class Hero {
         let ctx = this;
         bomb.startTimer(function () {
             ctx.bomb_count++;
+
+            if (after_explode_callback)
+                after_explode_callback();
         });
     }
 }
@@ -771,17 +774,24 @@ class Bot extends Hero{
         } else {
             // detect best action
             // place bomb
-            this.place_bomb();
+            this.place_bomb(function () {
+                context.walk();
+            });
             console.log("place bomb...now run!");
                // context.walk();
-            // this.hide_from_bomb(cell,  function () {
-            //    context.walk_way();
-            // });
+            this.hide_from_bomb(cell);
         }
     }
 
     check_is_dangerous_around(cell){
         return false;
+    }
+
+    hide_from_bomb(cell){
+        // let ways = new BotWalkWaysCollection();
+        // ways = ways.scan_ways(cell);
+        // let best_way = ways.get_best_way();
+        // console.log('best_way', cell.$el[0], best_way);
     }
 }
 
