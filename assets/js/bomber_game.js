@@ -610,6 +610,7 @@ class Bot extends Hero{
         this.intervelId = 0;
         this.walk_direction = "none";
         this.walk_steps_count = 1;
+        this.walk_speed = 450 * 1; // TODO get from config
     }
     render_getColor(){
         return "blue";
@@ -722,6 +723,12 @@ class Bot extends Hero{
                 let best_way = ways.get_best_way();
                 console.log('best_way', cell.$el[0], best_way);
 
+                if (best_way){
+                    context.stopWalk();
+                    context.walk_way(best_way);
+                    return;
+                }
+
                 // context.cell.is_monster = false;
                 //
                 // cell.is_monster = true;
@@ -740,7 +747,41 @@ class Bot extends Hero{
                 context.changeWalkDirection(context.walk_direction);
             }
 
-        }, 450 * 10); // TODO get from config
+        }, this.walk_speed);
+    }
+
+    walk_way(way){
+        let context = this;
+        let way_cells = way.cells;
+
+        let around = context.cell.around;
+        let cell = way_cells.shift();
+        // let cell = way.cells.pop(); // ?
+
+        // if (cell.isEnterableCell()){
+        context.enter_cell(cell);
+        // } else {
+        //
+        // }
+
+        if (way_cells.length){
+            this.intervelId = setTimeout(function () {
+                context.walk_way(way);
+            }, this.walk_speed);
+        } else {
+            // detect best action
+            // place bomb
+            this.place_bomb();
+            console.log("place bomb...now run!");
+               // context.walk();
+            // this.hide_from_bomb(cell,  function () {
+            //    context.walk_way();
+            // });
+        }
+    }
+
+    check_is_dangerous_around(cell){
+        return false;
     }
 }
 
@@ -755,7 +796,7 @@ class BotWalkWaysCollection {
 
     get_best_way(){
         let ranks = [];
-        let best_rank = -999;
+        let best_rank = 0;
         let best_way = null;
 
         for (let way of this.ways){
@@ -859,7 +900,7 @@ class BotWalkWay {
 
         let rank = 0;
 
-        rank -= this.cells.length;
+        // rank -= this.cells.length;
 
         // if (this.is_target_cell(this.cells[ this.cells.length - 1 ]))
         //     rank += 2;
