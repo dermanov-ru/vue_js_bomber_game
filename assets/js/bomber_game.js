@@ -728,7 +728,7 @@ class Bot extends Hero{
 
                 if (best_way){
                     context.stopWalk();
-                    context.walk_way(best_way);
+                    context.walk_way_and_place_bomb(best_way);
                     return;
                 }
 
@@ -753,7 +753,7 @@ class Bot extends Hero{
         }, this.walk_speed);
     }
 
-    walk_way(way){
+    walk_way_and_place_bomb(way){
         let context = this;
         let way_cells = way.cells;
 
@@ -769,19 +769,54 @@ class Bot extends Hero{
 
         if (way_cells.length){
             this.intervelId = setTimeout(function () {
-                context.walk_way(way);
+                context.walk_way_and_place_bomb(way);
             }, this.walk_speed);
         } else {
             // detect best action
             // place bomb
             this.place_bomb(function () {
-                // context.walk();
+                context.walk();
             });
             console.log("place bomb...now run!");
                // context.walk();
             this.hide_from_bomb(cell);
         }
     }
+
+    walk_way_and_turn(way){
+        let context = this;
+        let way_cells = way.cells;
+
+        let around = context.cell.around;
+        let cell = way_cells.shift();
+        // let cell = way.cells.pop(); // ?
+
+        // if (cell.isEnterableCell()){
+        context.enter_cell(cell);
+        // } else {
+        //
+        // }
+
+        if (way_cells.length){
+            this.intervelId = setTimeout(function () {
+                context.walk_way_and_turn(way);
+            }, this.walk_speed);
+        } else {
+            // // detect best action
+            // // place bomb
+            // this.place_bomb(function () {
+            //     // context.walk();
+            // });
+            // this.turn(way.direction);
+            console.log("now turn");
+            //    // context.walk();
+            // this.hide_from_bomb(cell);
+        }
+    }
+
+    // turn(old_direction){
+    //
+    // }
 
     check_is_dangerous_around(cell){
         return false;
@@ -790,7 +825,9 @@ class Bot extends Hero{
     hide_from_bomb(cell){
         let ways = new BotWalkWaysCollection();
         ways = ways.scan_ways(cell);
+        console.log('search for way to turn from cell ', cell.$el[0]);
         let way = ways.get_shortest_way_to_turn();
+        this.walk_way_and_turn(way);
         // let best_way = ways.get_best_way();
         // console.log('best_way', cell.$el[0], best_way);
     }
@@ -841,6 +878,12 @@ class BotWalkWaysCollection {
                 best_rank = rank;
                 best_way = way;
             }
+        }
+
+        if (best_rank){
+            // best_way.cells = best_way.cells.slice(0, best_rank);
+        } else {
+            // TODO ?
         }
 
         console.log('shortest_way_to_turn', best_rank, best_way);
@@ -958,21 +1001,37 @@ class BotWalkWay {
 
         let result = 0;
         let counter = 0;
-
+        let turn_cell = null;
+// debugger
         for (let cell of this.cells){
             counter++;
 
             if (this.is_horizontal_way()){
-                if ( cell.around.top_cell && cell.around.top_cell.isEnterableCell() || cell.around.bottom_cell && cell.around.bottom_cell.isEnterableCell()){
-                    result = counter;
+                if ( cell.around.top_cell && cell.around.top_cell.isEnterableCell()){
+                    turn_cell = cell.around.top_cell;
+                    break;
+                }
+                else if (cell.around.bottom_cell && cell.around.bottom_cell.isEnterableCell()){
+                    turn_cell = cell.around.bottom_cell;
                     break;
                 }
             } else {
-                if ( cell.around.left_cell && cell.around.left_cell.isEnterableCell() || cell.around.right_cell && cell.around.right_cell.isEnterableCell()){
-                    result = counter;
+                if ( cell.around.left_cell && cell.around.left_cell.isEnterableCell()){
+                    turn_cell = cell.around.left_cell;
+                    break;
+                }
+                else if ( cell.around.right_cell && cell.around.right_cell.isEnterableCell()){
+                    turn_cell = cell.around.right_cell;
                     break;
                 }
             }
+        }
+
+        if (counter){
+            this.cells = this.cells.slice(0, counter);
+            this.cells.push(turn_cell);
+
+            result = counter + 1;
         }
 
         return result;
