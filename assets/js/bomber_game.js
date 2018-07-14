@@ -761,11 +761,12 @@ class Bot extends Hero{
         let cell = way_cells.shift();
         // let cell = way.cells.pop(); // ?
 
-        // if (cell.isEnterableCell()){
-        context.enter_cell(cell);
-        // } else {
-        //
-        // }
+        if (cell.isEnterableForBot()){
+           context.enter_cell(cell);
+        } else {
+            context.stopWalk();
+            context.walk();
+        }
 
         if (way_cells.length){
             this.intervelId = setTimeout(function () {
@@ -791,11 +792,12 @@ class Bot extends Hero{
         let cell = way_cells.shift();
         // let cell = way.cells.pop(); // ?
 
-        // if (cell.isEnterableCell()){
-        context.enter_cell(cell);
-        // } else {
-        //
-        // }
+        if (cell.isEnterableForBot()){
+            context.enter_cell(cell);
+        } else {
+            context.stopWalk();
+            this.hide_from_bomb(this.cell);
+        }
 
         if (way_cells.length){
             this.intervelId = setTimeout(function () {
@@ -1007,20 +1009,20 @@ class BotWalkWay {
             counter++;
 
             if (this.is_horizontal_way()){
-                if ( cell.around.top_cell && cell.around.top_cell.isEnterableCell()){
+                if ( cell.around.top_cell && cell.around.top_cell.isEnterableForBot()){
                     turn_cell = cell.around.top_cell;
                     break;
                 }
-                else if (cell.around.bottom_cell && cell.around.bottom_cell.isEnterableCell()){
+                else if (cell.around.bottom_cell && cell.around.bottom_cell.isEnterableForBot()){
                     turn_cell = cell.around.bottom_cell;
                     break;
                 }
             } else {
-                if ( cell.around.left_cell && cell.around.left_cell.isEnterableCell()){
+                if ( cell.around.left_cell && cell.around.left_cell.isEnterableForBot()){
                     turn_cell = cell.around.left_cell;
                     break;
                 }
-                else if ( cell.around.right_cell && cell.around.right_cell.isEnterableCell()){
+                else if ( cell.around.right_cell && cell.around.right_cell.isEnterableForBot()){
                     turn_cell = cell.around.right_cell;
                     break;
                 }
@@ -1153,6 +1155,10 @@ class Cell {
 
     isEnterableForMonster(){
         return !(this.is_wall || this.is_earth || this.is_bomb || this.is_monster);
+    }
+
+    isEnterableForBot(){
+        return !(this.is_wall || this.is_earth || this.is_bomb || this.is_monster || this.is_exployed);
     }
 
     isEmptyCell(){
