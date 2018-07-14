@@ -744,8 +744,18 @@ class Bot extends Hero{
                 // cell.render();
 
                 context.walk_steps_count--;
-                if (!context.walk_steps_count)
-                    context.changeWalkDirection(context.walk_direction);
+                if (!context.walk_steps_count){
+                    // context.changeWalkDirection(context.walk_direction);
+
+                    // TODO place bomb then end of random walk way ???
+                    // context.stopWalk();
+                    // context.place_bomb(function () {
+                    //     context.walk();
+                    // });
+                    // console.log("place bomb while run...now run!");
+                    // // context.walk();
+                    // context.hide_from_bomb(cell);
+                }
             } else {
                 context.changeWalkDirection(context.walk_direction);
             }
@@ -788,15 +798,31 @@ class Bot extends Hero{
         let context = this;
         let way_cells = way.cells;
 
+        if (!way_cells.length){
+            console.log("the way is end - can't turn");
+            return;
+        }
+
         let around = context.cell.around;
         let cell = way_cells.shift();
         // let cell = way.cells.pop(); // ?
+
+        if (!cell){
+            console.log("the cell is null - can't turn");
+            return;
+        }
 
         if (cell.isEnterableForBot()){
             context.enter_cell(cell);
         } else {
             context.stopWalk();
-            this.hide_from_bomb(this.cell);
+            // this.hide_from_bomb(this.cell);
+
+            // lets wait some
+            setTimeout(function () {
+                console.log("cant enter to cell while go to turn - now wait");
+                context.hide_from_bomb(context.cell);
+            }, 1000);
         }
 
         if (way_cells.length){
@@ -829,6 +855,13 @@ class Bot extends Hero{
         ways = ways.scan_ways(cell);
         console.log('search for way to turn from cell ', cell.$el[0]);
         let way = ways.get_shortest_way_to_turn();
+
+        if (!way){
+            console.log("can't turn find way to turn after place bomb - lets walk");
+            this.walk();
+            return;
+        }
+
         this.walk_way_and_turn(way);
         // let best_way = ways.get_best_way();
         // console.log('best_way', cell.$el[0], best_way);
