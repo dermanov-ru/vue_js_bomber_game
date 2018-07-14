@@ -775,7 +775,7 @@ class Bot extends Hero{
             // detect best action
             // place bomb
             this.place_bomb(function () {
-                context.walk();
+                // context.walk();
             });
             console.log("place bomb...now run!");
                // context.walk();
@@ -788,8 +788,9 @@ class Bot extends Hero{
     }
 
     hide_from_bomb(cell){
-        // let ways = new BotWalkWaysCollection();
-        // ways = ways.scan_ways(cell);
+        let ways = new BotWalkWaysCollection();
+        ways = ways.scan_ways(cell);
+        let way = ways.get_shortest_way_to_turn();
         // let best_way = ways.get_best_way();
         // console.log('best_way', cell.$el[0], best_way);
     }
@@ -820,6 +821,29 @@ class BotWalkWaysCollection {
         }
 
         console.log('best_way', best_way);
+        return best_way;
+    }
+
+    get_shortest_way_to_turn(){
+        let ranks = [];
+        let best_rank = 0;
+        let best_way = null;
+        let rank = -999;
+
+        // debugger
+        for (let way of this.ways){
+            rank = way.get_steps_to_turn();
+
+            if (!rank)
+                continue;
+
+            if (rank > best_rank){
+                best_rank = rank;
+                best_way = way;
+            }
+        }
+
+        console.log('shortest_way_to_turn', best_rank, best_way);
         return best_way;
     }
 
@@ -926,6 +950,40 @@ class BotWalkWay {
         // let get_all_ways_cells()
 
         return rank;
+    }
+
+    get_steps_to_turn(){
+        if (!this.cells.length)
+            return 0;
+
+        let result = 0;
+        let counter = 0;
+
+        for (let cell of this.cells){
+            counter++;
+
+            if (this.is_horizontal_way()){
+                if ( cell.around.top_cell && cell.around.top_cell.isEnterableCell() || cell.around.bottom_cell && cell.around.bottom_cell.isEnterableCell()){
+                    result = counter;
+                    break;
+                }
+            } else {
+                if ( cell.around.left_cell && cell.around.left_cell.isEnterableCell() || cell.around.right_cell && cell.around.right_cell.isEnterableCell()){
+                    result = counter;
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    is_horizontal_way(){
+        return this.direction == "left_cell" || this.direction == "right_cell";
+    }
+
+    is_vertical_way(){
+        return this.direction == "top_cell" || this.direction == "bottom_cell";
     }
 
     is_earth_around(cell){
