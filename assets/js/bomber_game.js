@@ -613,7 +613,7 @@ class Bot extends Hero{
         this.intervelId = 0;
         this.walk_direction = "none";
         this.walk_steps_count = 1;
-        this.walk_speed = 250 * 1; // TODO get from config
+        this.walk_speed = 650 * 1; // TODO get from config
     }
     render_getColor(){
         return "blue";
@@ -923,6 +923,11 @@ class BotWalkWaysCollection {
 
         // debugger
         for (let way of this.ways){
+            if (way.is_bomb_on_way()){
+                debugger
+                continue;
+            }
+
             rank = way.get_steps_to_turn();
 
             if (!rank)
@@ -1149,13 +1154,27 @@ class BotWalkWay {
         return result;
     }
 
-    is_improver_on_way(current_cell){
+    is_improver_on_way(){
         // let aroundCells = current_cell.around.getLinearAroundCells(1);
         let result = 0;
 
         for (let cell of this.cells){
             if (cell.improver){
                 result += 5;
+
+                console.log('found improver on way', cell.$el[0]);
+            }
+        }
+
+        return result;
+    }
+
+    is_bomb_on_way(){
+        let result = 0;
+
+        for (let cell of this.cells){
+            if (cell.is_bomb){
+                result -= 10;
 
                 console.log('found improver on way', cell.$el[0]);
             }
@@ -1666,6 +1685,9 @@ class BomberGame {
 
         this.stopMonsters()
         this.lockHero()
+
+        if (this.bot)
+            this.bot.stopWalk();
     }
 
     stopMonsters(){
