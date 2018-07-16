@@ -61,7 +61,8 @@ class Around {
             aroud = left_cell.around;
             result.push(left_cell);
 
-            if (left_cell.is_earth)
+            // TODO extract and separete result by filter function
+            if (left_cell.is_earth && !left_cell.will_exployed)
                 break;
         }
 
@@ -79,7 +80,8 @@ class Around {
             aroud = right_cell.around;
             result.push(right_cell);
 
-            if (right_cell.is_earth)
+            // TODO extract and separete result by filter function
+            if (right_cell.is_earth && !right_cell.will_exployed)
                 break;
         }
 
@@ -97,7 +99,8 @@ class Around {
             aroud = top_cell.around;
             result.push(top_cell);
 
-            if (top_cell.is_earth)
+            // TODO extract and separete result by filter function
+            if (top_cell.is_earth && !top_cell.will_exployed)
                 break;
         }
 
@@ -115,7 +118,8 @@ class Around {
             aroud = bottom_cell.around;
             result.push(bottom_cell);
 
-            if (bottom_cell.is_earth)
+            // TODO extract and separete result by filter function
+            if (bottom_cell.is_earth && !bottom_cell.will_exployed)
                 break;
         }
 
@@ -235,6 +239,21 @@ class Bomb {
                 continue;
 
             cell.explode();
+        }
+    }
+
+    mark_exployed_cells(){
+        this.cell.will_exployed = true;
+        console.log("cell will exployed", this.cell.$el[0]);
+
+        let linearCells = this.cell.around.getLinearAroundCells(this.power);
+
+        for (let cell of linearCells){
+            if (!cell)
+                continue;
+
+            cell.will_exployed = true;
+            console.log("cell will exployed", cell.$el[0]);
         }
     }
 }
@@ -593,6 +612,8 @@ class Hero {
         this.cell.bomb = bomb;
         this.cell.render();
 
+        bomb.mark_exployed_cells();
+
         let ctx = this;
         bomb.startTimer(function () {
             ctx.bomb_count++;
@@ -611,9 +632,11 @@ class Bot extends Hero{
         // this.game = game;
         // this.cell = cell;
         this.intervelId = 0;
+        this.intervelId_dangerous = 0;
         this.walk_direction = "none";
         this.walk_steps_count = 1;
-        this.walk_speed = 650 * 1; // TODO get from config
+        this.walk_speed = 300 * 1; // TODO get from config
+        this.search_dengerous_speed = 200 * 1; // TODO get from config
     }
     render_getColor(){
         return "blue";
@@ -634,6 +657,34 @@ class Bot extends Hero{
         // this.walk(best_way);
 
         this.walk();
+        this.start_scan_dangerous();
+    }
+
+    stop_scan_dangerous(){
+        clearInterval(this.intervelId_dangerous);
+    }
+
+    start_scan_dangerous(){
+        this.stop_scan_dangerous();
+
+        let context = this;
+
+        this.intervelId_dangerous = setInterval(function () {
+            // если уже взорвался или съели
+            if (!context.cell || context.is_locked){
+                console.log("STOP scan for dangerous.");
+                context.stop_scan_dangerous();
+                return;
+            }
+
+            console.log("scan for dangerous...");
+
+            if (context.cell.will_exployed){
+                console.log("ALARM - found bomb around!");
+                context.hide_from_bomb(context.cell);
+                context.stop_scan_dangerous();
+            }
+        }, this.search_dengerous_speed);
     }
 
     scan(way){
@@ -725,7 +776,7 @@ class Bot extends Hero{
                 return;
             }
 
-            if (cell.isEnterableForBot()){
+            if (cell.isEnterableForBot(context.cell.will_exployed)){
                 context.enter_cell(cell);
 
                 /*
@@ -781,7 +832,7 @@ class Bot extends Hero{
         let cell = way_cells.shift();
         // let cell = way.cells.pop(); // ?
 
-        if (cell.isEnterableForBot()){
+        if (cell.isEnterableForBot(context.cell.will_exployed)){
            context.enter_cell(cell);
         } else {
             context.stopWalk();
@@ -818,6 +869,12 @@ class Bot extends Hero{
             return;
         }
 
+        if (!context.cell){
+            console.log("context.cell is not exists - can't continue to turn. possible bot exployed?");
+            context.stopWalk();
+            return;
+        }
+
         let around = context.cell.around;
         let cell = way_cells.shift();
         // let cell = way.cells.pop(); // ?
@@ -828,7 +885,7 @@ class Bot extends Hero{
             return;
         }
 
-        if (cell.isEnterableForBot()){
+        if (cell.isEnterableForBot(context.cell.will_exployed)){
             context.enter_cell(cell);
         } else {
             context.stopWalk();
@@ -836,6 +893,7 @@ class Bot extends Hero{
 
             // lets wait some
             let wait_ms = 1000;
+            debugger
             console.log("cant enter to cell while go to turn - now wait " + wait_ms );
             setTimeout(function () {
                 console.log("cant enter to cell while go to turn - now walk");
@@ -856,6 +914,7 @@ class Bot extends Hero{
             // });
             // this.turn(way.direction);
             console.log("now turn");
+            context.start_scan_dangerous();
             //    // context.walk();
             // this.hide_from_bomb(cell);
         }
@@ -923,10 +982,10 @@ class BotWalkWaysCollection {
 
         // debugger
         for (let way of this.ways){
-            if (way.is_bomb_on_way()){
-                debugger
-                continue;
-            }
+            // if (way.is_bomb_on_way()){
+            //     // debugger
+            //     continue;
+            // }
 
             rank = way.get_steps_to_turn();
 
@@ -974,7 +1033,8 @@ class BotWalkWaysCollection {
         // debugger
         let way = new BotWalkWay(direction, this.bot);
 
-        if (!way_first_cell.isEnterableForBot())
+        // debugger
+        if (!way_first_cell.isEnterableForBot(this.bot.cell.will_exployed))
             return way;
 
         way.cells.push(way_first_cell);
@@ -986,7 +1046,7 @@ class BotWalkWaysCollection {
             if (!way_next_cell)
                 break;
 
-            if (!way_next_cell.isEnterableForBot())
+            if (!way_next_cell.isEnterableForBot(this.bot.cell.will_exployed))
                 break;
 
             way.cells.push(way_next_cell);
@@ -1003,6 +1063,20 @@ class BotWalkWaysCollection {
         }
 
         console.log('get_all_ways_cells', get_all_ways_cells);
+        return result;
+    }
+
+    is_bomb_on_ways(){
+        let result = false;
+
+        for (let way of this.ways){
+            if (way.is_bomb_on_way()){
+                result = true;
+                // debugger
+                break;
+            }
+        }
+
         return result;
     }
 }
@@ -1071,20 +1145,20 @@ class BotWalkWay {
             counter++;
 
             if (this.is_horizontal_way()){
-                if ( cell.around.top_cell && cell.around.top_cell.isEnterableForBot()){
+                if ( cell.around.top_cell && cell.around.top_cell.isEnterableForBot(this.bot.cell.will_exployed)){
                     turn_cell = cell.around.top_cell;
                     break;
                 }
-                else if (cell.around.bottom_cell && cell.around.bottom_cell.isEnterableForBot()){
+                else if (cell.around.bottom_cell && cell.around.bottom_cell.isEnterableForBot(this.bot.cell.will_exployed)){
                     turn_cell = cell.around.bottom_cell;
                     break;
                 }
             } else {
-                if ( cell.around.left_cell && cell.around.left_cell.isEnterableForBot()){
+                if ( cell.around.left_cell && cell.around.left_cell.isEnterableForBot(this.bot.cell.will_exployed)){
                     turn_cell = cell.around.left_cell;
                     break;
                 }
-                else if ( cell.around.right_cell && cell.around.right_cell.isEnterableForBot()){
+                else if ( cell.around.right_cell && cell.around.right_cell.isEnterableForBot(this.bot.cell.will_exployed)){
                     turn_cell = cell.around.right_cell;
                     break;
                 }
@@ -1170,14 +1244,19 @@ class BotWalkWay {
     }
 
     is_bomb_on_way(){
-        let result = 0;
+        let result = false;
 
-        for (let cell of this.cells){
-            if (cell.is_bomb){
-                result -= 10;
+        // debugger
+        for (let current_cell of this.cells){
+            let aroundCells = current_cell.around.getLinearAroundCells(1);
 
-                console.log('found improver on way', cell.$el[0]);
+            for (let cell of aroundCells){
+                if (cell.is_bomb){
+                    result = true;
+                    break;
+                }
             }
+
         }
 
         return result;
@@ -1204,6 +1283,7 @@ class Cell {
         this.improver = null;
 
         this.bot = null;
+        this.will_exployed = false;
     }
 
     clean(){
@@ -1283,8 +1363,11 @@ class Cell {
         return !(this.is_wall || this.is_earth || this.is_bomb || this.is_monster || (this.is_hero && this.hero === this.game.bot));
     }
 
-    isEnterableForBot(){
-        return !(this.is_wall || this.is_earth || this.is_bomb || this.is_monster || this.is_exployed || this.is_hero || (this.is_contain_exit_door && !this.is_earth));
+    isEnterableForBot(is_current_cell_will_exployed){
+        return !(
+            this.is_wall || this.is_earth || this.is_bomb || this.is_monster || this.is_exployed || this.is_hero || (this.is_contain_exit_door && !this.is_earth)
+            // || (!is_current_cell_will_exployed && this.will_exployed)
+        );
     }
 
     isEmptyCell(){
@@ -1338,6 +1421,8 @@ class Cell {
 
         // allow next near placed bomb to explode next linear earth cell
         this.is_earth = false;
+
+        this.will_exployed = false;
 
         let context = this;
         setTimeout(function () {
