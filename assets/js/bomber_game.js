@@ -613,7 +613,7 @@ class Bot extends Hero{
         this.intervelId = 0;
         this.walk_direction = "none";
         this.walk_steps_count = 1;
-        this.walk_speed = 450 * 1; // TODO get from config
+        this.walk_speed = 250 * 1; // TODO get from config
     }
     render_getColor(){
         return "blue";
@@ -687,11 +687,21 @@ class Bot extends Hero{
     }
 
     walk(){
+        this.stopWalk();
+
+        // если уже взорвался или съели
+        if (!this.cell || this.is_locked)
+            return;
+
         let context = this;
 
         this.changeWalkDirection();
 
         this.intervelId = setInterval(function () {
+            // если уже взорвался или съели
+            if (!context.cell || context.is_locked)
+                return;
+
             let around = context.cell.around;
             let cell;
 
@@ -715,14 +725,14 @@ class Bot extends Hero{
                 return;
             }
 
-            if (cell.isEnterableCell()){
+            if (cell.isEnterableForBot()){
                 context.enter_cell(cell);
 
                 /*
                 *
                 * */
-                let ways = new BotWalkWaysCollection();
-                ways = ways.scan_ways(cell);
+                let ways = new BotWalkWaysCollection(context);
+                ways = ways.scan_ways(cell, context);
                 let best_way = ways.get_best_way();
                 console.log('best_way', cell.$el[0], best_way);
 
@@ -775,7 +785,7 @@ class Bot extends Hero{
            context.enter_cell(cell);
         } else {
             context.stopWalk();
-            context.walk();
+            // context.walk();
         }
 
         if (way_cells.length){
@@ -786,10 +796,14 @@ class Bot extends Hero{
             // detect best action
             // place bomb
             this.place_bomb(function () {
+                console.log("bomb exployed, lets go!");
+
+                // TODO check can walk, still alive
                 context.walk();
             });
             console.log("place bomb...now run!");
                // context.walk();
+            context.stopWalk();
             this.hide_from_bomb(cell);
         }
     }
@@ -800,6 +814,7 @@ class Bot extends Hero{
 
         if (!way_cells.length){
             console.log("the way is end - can't turn");
+            this.walk();
             return;
         }
 
@@ -809,6 +824,7 @@ class Bot extends Hero{
 
         if (!cell){
             console.log("the cell is null - can't turn");
+            this.walk();
             return;
         }
 
@@ -819,10 +835,13 @@ class Bot extends Hero{
             // this.hide_from_bomb(this.cell);
 
             // lets wait some
+            let wait_ms = 1000;
+            console.log("cant enter to cell while go to turn - now wait " + wait_ms );
             setTimeout(function () {
-                console.log("cant enter to cell while go to turn - now wait");
-                context.hide_from_bomb(context.cell);
-            }, 1000);
+                console.log("cant enter to cell while go to turn - now walk");
+                // context.hide_from_bomb(context.cell);
+                // context.walk();
+            }, wait_ms);
         }
 
         if (way_cells.length){
@@ -851,14 +870,14 @@ class Bot extends Hero{
     }
 
     hide_from_bomb(cell){
-        let ways = new BotWalkWaysCollection();
-        ways = ways.scan_ways(cell);
+        let ways = new BotWalkWaysCollection(this);
+        ways = ways.scan_ways(cell, this);
         console.log('search for way to turn from cell ', cell.$el[0]);
         let way = ways.get_shortest_way_to_turn();
 
         if (!way){
             console.log("can't turn find way to turn after place bomb - lets walk");
-            this.walk();
+            // this.walk();
             return;
         }
 
@@ -869,8 +888,9 @@ class Bot extends Hero{
 }
 
 class BotWalkWaysCollection {
-    constructor() {
+    constructor(bot) {
         this.ways = [];
+        this.bot = bot;
     }
 
     add_way(way){
@@ -883,7 +903,6 @@ class BotWalkWaysCollection {
         let best_way = null;
 
         for (let way of this.ways){
-            // let rank = ranks.push( way.get_rank() );
             let rank = way.get_rank();
 
             if (rank > best_rank){
@@ -926,8 +945,8 @@ class BotWalkWaysCollection {
     }
 
 
-    scan_ways(cell){
-        let ways = new BotWalkWaysCollection();
+    scan_ways(cell, bot){
+        let ways = new BotWalkWaysCollection(bot);
 
         // 1 - top, 2- right, - 3 bottom, 4 - left
         let directions = ["top_cell", "right_cell", "bottom_cell", "left_cell"];
@@ -947,9 +966,10 @@ class BotWalkWaysCollection {
     }
 
     scan_way(way_first_cell, direction){
-        let way = new BotWalkWay(direction);
+        // debugger
+        let way = new BotWalkWay(direction, this.bot);
 
-        if (!way_first_cell.isEnterableCell())
+        if (!way_first_cell.isEnterableForBot())
             return way;
 
         way.cells.push(way_first_cell);
@@ -961,7 +981,7 @@ class BotWalkWaysCollection {
             if (!way_next_cell)
                 break;
 
-            if (!way_next_cell.isEnterableCell())
+            if (!way_next_cell.isEnterableForBot())
                 break;
 
             way.cells.push(way_next_cell);
@@ -983,7 +1003,7 @@ class BotWalkWaysCollection {
 }
 
 class BotWalkWay {
-    constructor(direction) {
+    constructor(direction, bot) {
         this.direction = direction;
         this.cells = [];
         this.is_bomb = false;
@@ -993,6 +1013,7 @@ class BotWalkWay {
 
         this.visited_cells = [];
         this.sub_ways = [];
+        this.bot = bot;
     }
 
     visit(cell) {
@@ -1000,8 +1021,8 @@ class BotWalkWay {
     }
 
     scan_sub_ways(cell) {
-        let ways = new BotWalkWaysCollection();
-        ways = ways.scan_ways(cell);
+        let ways = new BotWalkWaysCollection(this.bot);
+        ways = ways.scan_ways(cell, this.bot);
 
         this.sub_ways = ways;
     }
@@ -1019,6 +1040,9 @@ class BotWalkWay {
 
         let end_path_cell = this.cells[ this.cells.length - 1 ];
         rank += this.is_earth_around(end_path_cell);
+        rank += this.is_hero_around(end_path_cell);
+        rank += this.is_door_around(end_path_cell);
+        rank += this.is_improver_on_way();
         // rank += this.is_improver_around(end_path_cell);
 
         // for (let cell of this.cells){
@@ -1085,8 +1109,56 @@ class BotWalkWay {
         let result = 0;
 
         for (let cell of aroundCells){
-            if (cell.is_earth)
-                result += 2;
+            if (cell.is_earth){
+                result += 1;
+
+                console.log('found is_earth_around', cell.$el[0]);
+            }
+        }
+
+        return result;
+    }
+
+    is_hero_around(current_cell){
+        let aroundCells = current_cell.around.getLinearAroundCells(1);
+        let result = 0;
+
+        for (let cell of aroundCells){
+            if (cell.is_hero && cell.hero !== this.bot){
+                result += 4;
+
+                console.log('found is_hero_around', cell.$el[0]);
+            }
+        }
+
+        return result;
+    }
+
+    is_door_around(current_cell){
+        let aroundCells = current_cell.around.getLinearAroundCells(1);
+        let result = 0;
+
+        for (let cell of aroundCells){
+            if (cell.is_contain_exit_door && !cell.is_earth){
+                result += 1;
+
+                console.log('found is_door_around', cell.$el[0]);
+            }
+        }
+
+        return result;
+    }
+
+    is_improver_on_way(current_cell){
+        // let aroundCells = current_cell.around.getLinearAroundCells(1);
+        let result = 0;
+
+        for (let cell of this.cells){
+            if (cell.improver){
+                result += 5;
+
+                console.log('found improver on way', cell.$el[0]);
+            }
         }
 
         return result;
@@ -1111,6 +1183,8 @@ class Cell {
         this.monster = null;
 
         this.improver = null;
+
+        this.bot = null;
     }
 
     clean(){
@@ -1187,11 +1261,11 @@ class Cell {
     }
 
     isEnterableForMonster(){
-        return !(this.is_wall || this.is_earth || this.is_bomb || this.is_monster);
+        return !(this.is_wall || this.is_earth || this.is_bomb || this.is_monster || (this.is_hero && this.hero === this.game.bot));
     }
 
     isEnterableForBot(){
-        return !(this.is_wall || this.is_earth || this.is_bomb || this.is_monster || this.is_exployed);
+        return !(this.is_wall || this.is_earth || this.is_bomb || this.is_monster || this.is_exployed || this.is_hero || (this.is_contain_exit_door && !this.is_earth));
     }
 
     isEmptyCell(){
@@ -1219,8 +1293,19 @@ class Cell {
 
             if (!this.hero.lifes_count){
                 this.hero.is_exployed = true;
-                this.game.endGame(false);
+
+                if (this.hero instanceof Bot ){
+                    console.log("bot has exployed")
+
+                    this.hero.stopWalk();
+                    this.hero.is_locked = true;
+                    this.hero.cell = null;
+                    this.is_hero = false;
+                } else { // instanceof Hero
+                    this.game.endGame(false);
+                }
             }
+
         }
 
         this.render();
@@ -1381,6 +1466,7 @@ class BomberGame {
         console.log('heroCell', heroCell);
 
         let bot  = new Bot(heroCell);
+        this.bot = bot;
         bot.explode_power = this.game_level.hero_explode_power;
         bot.bomb_count = this.game_level.hero_bombs_count;
         // bot.safe_zone = Tools.sub_matrix(this.cells, this.game_field_size, -3, 0); // TODO
