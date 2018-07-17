@@ -834,6 +834,10 @@ class Bot extends Hero{
         let context = this;
         let way_cells = way.cells;
 
+        // bot already exployed
+        if (!context.cell)
+            return;
+
         let around = context.cell.around;
         let cell = way_cells.shift();
         // let cell = way.cells.pop(); // ?
