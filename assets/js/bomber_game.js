@@ -1515,11 +1515,11 @@ class BomberGame {
         this.initCells($cells);
         this.initWalls();
         this.initHero();
+        this.initBots();
         this.initMonsters(this.basic_monster_count);
         this.initEarth();
         this.initExitDoor();
         this.initImprovers();
-        this.initBots();
 
         this.renderGame();
     }
@@ -1621,7 +1621,9 @@ class BomberGame {
             if (!cell.isEmptyCell())
                 continue;
 
-            // TODO check bots linear cell
+            if (this.bot && this.bot.isLinearCell(cell))
+                continue;
+
             if (this.hero.isLinearCell(cell))
                 continue;
 
