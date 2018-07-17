@@ -850,7 +850,7 @@ class Bot extends Hero{
                 console.log("bomb exployed, lets go!");
 
                 // TODO check can walk, still alive
-                context.walk();
+                // context.walk();
             });
             console.log("place bomb...now run!");
                // context.walk();
@@ -893,7 +893,7 @@ class Bot extends Hero{
 
             // lets wait some
             let wait_ms = 1000;
-            debugger
+            // debugger
             console.log("cant enter to cell while go to turn - now wait " + wait_ms );
             setTimeout(function () {
                 console.log("cant enter to cell while go to turn - now walk");
@@ -915,7 +915,7 @@ class Bot extends Hero{
             // this.turn(way.direction);
             console.log("now turn");
             context.start_scan_dangerous();
-            //    // context.walk();
+            context.walk();
             // this.hide_from_bomb(cell);
         }
     }
