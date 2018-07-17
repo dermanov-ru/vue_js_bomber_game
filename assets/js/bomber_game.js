@@ -622,6 +622,12 @@ class Hero {
                 after_explode_callback();
         });
     }
+
+    spandLife(){
+        // TODO fix cases then hero explodes many times - remove hero from cell instantly
+        if (this.lifes_count > 0)
+            this.lifes_count--;
+    }
 }
 
 class Bot extends Hero{
@@ -1391,7 +1397,7 @@ class Cell {
         this.is_bomb = false;
 
         if (this.is_hero){
-            this.hero.lifes_count--;
+            this.hero.spandLife();
 
             if (!this.hero.lifes_count){
                 this.hero.is_exployed = true;
@@ -1450,7 +1456,7 @@ class Cell {
         }
 
         if (this.is_monster){
-            this.hero.lifes_count--;
+            this.hero.spandLife();
 
             if (!this.hero.lifes_count){
                 this.hero.is_exployed = true;
@@ -1459,7 +1465,7 @@ class Cell {
         }
 
         if (this.is_exployed){
-            this.hero.lifes_count--;
+            this.hero.spandLife();
 
             if (!this.hero.lifes_count){
                 this.hero.is_exployed = true;
@@ -1485,7 +1491,7 @@ class Cell {
         }
 
         if (this.is_hero){
-            this.hero.lifes_count--;
+            this.hero.spandLife();
 
             if (!this.hero.lifes_count){
                 this.hero.is_exployed = true;
