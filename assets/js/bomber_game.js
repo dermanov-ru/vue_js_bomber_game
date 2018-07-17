@@ -1701,6 +1701,9 @@ class BomberGame {
             if (this.hero.isSafeZoneCell(cell))
                 continue;
 
+            if (this.bot && this.bot.isLinearCell(cell))
+                continue;
+
             let newMonster = new Monster(this, cell);
             newMonster.wrap_with_earth(this.hero);
             newMonster.walk();
