@@ -22,7 +22,9 @@ let BomberApp = new Vue({
         this.init_gamepad_control();
     },
     data: {
-        level : null,
+        level : {
+            field_size : 0
+        },
         levels : [
             // new BomberGameLevel(6, 3, 1, 1, 3, 3, 4, 1), // TODO remove debug level
             new BomberGameLevel(5, 5, 1, 1, 1, 0, 0),
