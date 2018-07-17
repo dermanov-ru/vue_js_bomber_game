@@ -641,7 +641,7 @@ class Bot extends Hero{
         this.intervelId_dangerous = 0;
         this.walk_direction = "none";
         this.walk_steps_count = 1;
-        this.walk_speed = 300 * 1; // TODO get from config
+        this.walk_speed = 350 * 1; // TODO get from config
         this.search_dengerous_speed = 200 * 1; // TODO get from config
     }
     render_getColor(){
@@ -1372,7 +1372,7 @@ class Cell {
     isEnterableForBot(is_current_cell_will_exployed){
         return !(
             this.is_wall || this.is_earth || this.is_bomb || this.is_monster || this.is_exployed || this.is_hero || (this.is_contain_exit_door && !this.is_earth)
-            // || (!is_current_cell_will_exployed && this.will_exployed)
+            || (!is_current_cell_will_exployed && this.will_exployed)
         );
     }
 
