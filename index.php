@@ -15,7 +15,8 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/functions.php";
 <head>
     <title>Игра «Бомбер» на vue.js</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width">
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />-->
 
     <meta property="og:title" content='Игра «Бомбер» на vue.js' />
     <meta property="og:image" content='/i/screen.png' />
@@ -26,7 +27,7 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/functions.php";
     <link rel="stylesheet" href="<?=includeAssetFile("/assets/css/main.css")?>" />
 </head>
 <body>
-    <div id="bomber_game" class="bomber_game" v-cloak>
+    <div id="bomber_game" class="bomber_game" v-cloak v-bind:style="{ width: (level.field_size * 52 + 50) + 'px' }">
         
         <div class="bomber_game_status_bar titlle">
             <div class="bomber_game_status_bar_item" title="">Игра «Бомбер»</div>
@@ -49,7 +50,7 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/functions.php";
             </template>
         </div>
 
-        <div class="bomber_game_status_bar"  v-if="message">
+        <div class="bomber_game_status_bar"  v-if="game_over">
             <div class="bomber_game_status_bar_item">{{message}}</div>
             <div class="bomber_game_status_bar_item bomber_game_status_bar_item_sep"> - </div>
             <a class="bomber_game_status_bar_item green" href="#" @click.prevent="restart_game">Esc - начать с начала</a>
@@ -59,6 +60,14 @@ require_once $_SERVER["DOCUMENT_ROOT"] . "/functions.php";
             <a class="bomber_game_status_bar_item orange" href="https://dermanov.ru#from=bomber_game" target="_blank">Марк Дерманов</a>
             <div class="bomber_game_status_bar_item bomber_game_status_bar_item_sep">|</div>
             <a class="bomber_game_status_bar_item orange" href="https://github.com/dermanov-ru/vue_js_bomber_game" target="_blank" >Fork me on GitHub</a>
+        </div>
+        
+        <div class="bomber_mobile_gamepad" v-if="!game_over && show_mobile_gamepad">
+            <button class="bomber_mobile_gamepad_item bomber_mobile_gamepad_item__top" @click.prevent="move_top"></button>
+            <button class="bomber_mobile_gamepad_item bomber_mobile_gamepad_item__left" @click.prevent="move_left"></button>
+            <button class="bomber_mobile_gamepad_item bomber_mobile_gamepad_item__right" @click.prevent="move_right"></button>
+            <button class="bomber_mobile_gamepad_item bomber_mobile_gamepad_item__bottom" @click.prevent="move_bottom"></button>
+            <button class="bomber_mobile_gamepad_item bomber_mobile_gamepad_item__place_bomb" @click.prevent="place_bomb"><i class="fas fa-bomb"></i></button>
         </div>
     </div>
 

@@ -35,6 +35,8 @@
     text-align: center;
     max-width: 800px;
     margin: 0 auto;
+    min-width: 500px;
+    touch-action: manipulation;
 }
 
 .bomber_game_status_bar {
@@ -148,4 +150,52 @@
     font-size: 20px;
     right: 0%;
     left: auto;
+}
+
+.bomber_mobile_gamepad{
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    height: 230px;
+    opacity: 0.15;
+}
+
+.bomber_mobile_gamepad_item{
+    width: 100px;
+    height: 100px;
+    background: green;
+    position: absolute;
+    border-radius: 50px;
+    outline: snow;
+}
+
+.bomber_mobile_gamepad_item.bomber_mobile_gamepad_item__top{
+    left: 80px;
+    top: 0;
+}
+
+.bomber_mobile_gamepad_item.bomber_mobile_gamepad_item__right{
+    left: 160px;
+    top: 65px;
+}
+
+.bomber_mobile_gamepad_item.bomber_mobile_gamepad_item__bottom{
+    left: 80px;
+    bottom: 0;
+}
+
+.bomber_mobile_gamepad_item.bomber_mobile_gamepad_item__left{
+    left: 0;
+    top: 65px;
+}
+
+.bomber_mobile_gamepad_item.bomber_mobile_gamepad_item__place_bomb{
+    right: 0px;
+    top: 64px;
+    width: 200px;
+    text-align: center;
+    font-size: 60px;
+    line-height: 100px;
+    color: black;
 }
