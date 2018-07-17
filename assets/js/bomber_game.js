@@ -870,7 +870,10 @@ class Bot extends Hero{
             console.log("place bomb...now run!");
                // context.walk();
             context.stopWalk();
-            this.hide_from_bomb(cell);
+
+            setTimeout(function () {
+                context.hide_from_bomb(cell);
+            }, 150);
         }
     }
 
