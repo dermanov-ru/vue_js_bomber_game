@@ -8,7 +8,7 @@
  */
 
 class BomberGameLevel {
-    constructor(field_size, monsters_count, hero_bombs_count, hero_explode_power, improver_bombs_count, improver_power_count, lifes_power_count) {
+    constructor(field_size, monsters_count, hero_bombs_count, hero_explode_power, improver_bombs_count, improver_power_count, lifes_power_count, bots_count) {
         this.field_size = field_size;
         this.monsters_count = monsters_count;
         this.hero_bombs_count = hero_bombs_count;
@@ -16,6 +16,7 @@ class BomberGameLevel {
         this.improver_bombs_count = improver_bombs_count;
         this.improver_power_count = improver_power_count;
         this.lifes_power_count = lifes_power_count;
+        this.bots_count = bots_count;
     }
 }
 
@@ -1586,6 +1587,10 @@ class BomberGame {
     }
 
     initBots(){
+        // TODO spawn many bots in different corners
+        if (!this.game_level.bots_count)
+            return;
+
         let heroCell = Tools.get_corner_cell(this.cells, this.game_level.field_size, 4);
         console.log('heroCell', heroCell);
 
