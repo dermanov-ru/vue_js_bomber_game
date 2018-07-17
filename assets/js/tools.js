@@ -136,6 +136,57 @@ let Tools = {
 
         return sub_matrix;
     },
+
+    /**
+    * corner = {1, 2, 3, 4}
+    *
+    * 1|.|2
+    * .|.|.
+    * 3|.|4
+    *
+    *
+    * */
+    get_corner_cell(cells, matrix_size, corner){
+        let result;
+        let cellY = 0;
+        let cellX = 0;
+        let cell_index = 0;
+
+        result = cells[ cell_index ];
+
+        switch (corner){
+            case 1:
+                cellY = 0;
+                cellX = 0;
+                cell_index = cellY * matrix_size + cellX;
+
+                result = cells[ cell_index ];
+            break;
+            case 2:
+                cellY = 0;
+                cellX = matrix_size - 1;
+                cell_index = cellY * matrix_size + cellX;
+
+                result = cells[ cell_index ];
+            break;
+            case 3:
+                cellY = matrix_size - 1;
+                cellX = 0;
+                cell_index = cellY * matrix_size + cellX;
+
+                result = cells[ cell_index ];
+            break;
+            case 4:
+                cellY = matrix_size - 1;
+                cellX = matrix_size - 1;
+                cell_index = cellY * matrix_size + cellX;
+
+                result = cells[ cell_index ];
+            break;
+        }
+
+        return result;
+    },
     is_mobil_device : function(){
         let userAgent = navigator.userAgent;
 

@@ -8,7 +8,7 @@
  */
 
 class BomberGameLevel {
-    constructor(field_size, monsters_count, hero_bombs_count, hero_explode_power, improver_bombs_count, improver_power_count, lifes_power_count) {
+    constructor(field_size, monsters_count, hero_bombs_count, hero_explode_power, improver_bombs_count, improver_power_count, lifes_power_count, bots_count) {
         this.field_size = field_size;
         this.monsters_count = monsters_count;
         this.hero_bombs_count = hero_bombs_count;
@@ -16,6 +16,7 @@ class BomberGameLevel {
         this.improver_bombs_count = improver_bombs_count;
         this.improver_power_count = improver_power_count;
         this.lifes_power_count = lifes_power_count;
+        this.bots_count = bots_count;
     }
 }
 
@@ -61,7 +62,8 @@ class Around {
             aroud = left_cell.around;
             result.push(left_cell);
 
-            if (left_cell.is_earth)
+            // TODO extract and separete result by filter function
+            if (left_cell.is_earth && !left_cell.will_exployed)
                 break;
         }
 
@@ -79,7 +81,8 @@ class Around {
             aroud = right_cell.around;
             result.push(right_cell);
 
-            if (right_cell.is_earth)
+            // TODO extract and separete result by filter function
+            if (right_cell.is_earth && !right_cell.will_exployed)
                 break;
         }
 
@@ -97,7 +100,8 @@ class Around {
             aroud = top_cell.around;
             result.push(top_cell);
 
-            if (top_cell.is_earth)
+            // TODO extract and separete result by filter function
+            if (top_cell.is_earth && !top_cell.will_exployed)
                 break;
         }
 
@@ -115,7 +119,8 @@ class Around {
             aroud = bottom_cell.around;
             result.push(bottom_cell);
 
-            if (bottom_cell.is_earth)
+            // TODO extract and separete result by filter function
+            if (bottom_cell.is_earth && !bottom_cell.will_exployed)
                 break;
         }
 
@@ -235,6 +240,21 @@ class Bomb {
                 continue;
 
             cell.explode();
+        }
+    }
+
+    mark_exployed_cells(){
+        this.cell.will_exployed = true;
+        console.log("cell will exployed", this.cell.$el[0]);
+
+        let linearCells = this.cell.around.getLinearAroundCells(this.power);
+
+        for (let cell of linearCells){
+            if (!cell)
+                continue;
+
+            cell.will_exployed = true;
+            console.log("cell will exployed", cell.$el[0]);
         }
     }
 }
@@ -364,6 +384,98 @@ class Monster {
     }
 }
 
+class Walkable {
+    constructor(game, cell) {
+        this.game = game;
+        this.cell = cell;
+        this.intervelId = 0;
+        this.walk_direction = "none";
+        this.walk_steps_count = 1;
+    }
+
+    resetWalkStepsCount(){
+        this.walk_steps_count = Tools.random(1, 10);
+    }
+
+    changeWalkDirection(oldDirection){
+        this.walk_direction = Tools.shuffle(["left", "right", "top", "bottom"]).pop();
+
+        if (this.walk_direction == oldDirection){
+            this.changeWalkDirection(oldDirection);
+            return;
+        }
+
+        this.resetWalkStepsCount();
+    }
+
+    changeWalkDirectionLinear(oldDirection){
+        let linearDirections = {
+            "left" : "right",
+            "top" : "bottom",
+            "right" : "left",
+            "bottom" : "top"
+        }
+
+        this.walk_direction = linearDirections[ oldDirection ];
+        this.resetWalkStepsCount();
+    }
+
+    stopWalk(){
+        clearInterval(this.intervelId);
+    }
+
+    walk(){
+        let context = this;
+
+        this.changeWalkDirection();
+
+        this.intervelId = setInterval(function () {
+            let around = context.cell.around;
+            let cell;
+
+            switch (context.walk_direction){
+                case "top":
+                    cell = around.top_cell;
+                    break;
+                case "left":
+                    cell = around.left_cell;
+                    break;
+                case "right":
+                    cell = around.right_cell;
+                    break;
+                case "bottom":
+                    cell = around.bottom_cell;
+                    break;
+            }
+
+            if (!cell){
+                context.changeWalkDirection(context.walk_direction);
+                return;
+            }
+
+            if (cell.isEnterableForMonster()){
+                context.cell.is_monster = false;
+
+                cell.is_monster = true;
+                cell.monster = context;
+                cell.enterMonster(context);
+
+                context.cell.render();
+                context.cell = cell;
+
+                cell.render();
+
+                context.walk_steps_count--;
+                if (!context.walk_steps_count)
+                    context.changeWalkDirection(context.walk_direction);
+            } else {
+                context.changeWalkDirection(context.walk_direction);
+            }
+
+        }, 700); // TODO get from config
+    }
+}
+
 class Hero {
     constructor(cell) {
         this.cell = cell;
@@ -386,9 +498,15 @@ class Hero {
         return this.safe_zone.indexOf(cell) > -1
     }
 
+    render_getColor(){
+        return "green";
+    }
+
     render(){
         this.cell.$el.addClass("hero");
-        this.cell.$el.append('<i class="fas fa-user-astronaut hero"></i>');
+
+        let color = this.render_getColor();
+        this.cell.$el.append('<i class="fas fa-user-astronaut hero ' + color + '"></i>');
 
         if (this.is_exployed){
             this.animateExplode();
@@ -478,7 +596,7 @@ class Hero {
         }
     }
 
-    place_bomb(){
+    place_bomb(after_explode_callback){
         if (this.is_locked)
             return;
 
@@ -495,10 +613,672 @@ class Hero {
         this.cell.bomb = bomb;
         this.cell.render();
 
+        bomb.mark_exployed_cells();
+
         let ctx = this;
         bomb.startTimer(function () {
             ctx.bomb_count++;
+
+            if (after_explode_callback)
+                after_explode_callback();
         });
+    }
+
+    spandLife(){
+        // TODO fix cases then hero explodes many times - remove hero from cell instantly
+        if (this.lifes_count > 0)
+            this.lifes_count--;
+    }
+}
+
+class Bot extends Hero{
+    constructor(cell){
+        // parent.constructor(cell)
+        super(cell);
+
+        // this.game = game;
+        // this.cell = cell;
+        this.intervelId = 0;
+        this.intervelId_dangerous = 0;
+        this.walk_direction = "none";
+        this.walk_steps_count = 1;
+        this.walk_speed = 350 * 1; // TODO get from config
+        this.search_dengerous_speed = 200 * 1; // TODO get from config
+    }
+    render_getColor(){
+        return "blue";
+    }
+
+    goWalk(){
+        /*
+        * search paths
+        * sort paths by relevant
+        * go
+        * place bomb
+        * hide from bomb
+        * */
+
+        // let ways = new BotWalkWaysCollection();
+        // ways = ways.scan_ways(this.cell);
+        // let best_way = ways.get_best_way();
+        // this.walk(best_way);
+
+        this.walk();
+        this.start_scan_dangerous();
+    }
+
+    stop_scan_dangerous(){
+        clearInterval(this.intervelId_dangerous);
+    }
+
+    start_scan_dangerous(){
+        this.stop_scan_dangerous();
+
+        let context = this;
+
+        this.intervelId_dangerous = setInterval(function () {
+            // если уже взорвался или съели
+            if (!context.cell || context.is_locked){
+                console.log("STOP scan for dangerous.");
+                context.stop_scan_dangerous();
+                return;
+            }
+
+            console.log("scan for dangerous...");
+
+            if (context.cell.will_exployed){
+                console.log("ALARM - found bomb around!");
+                context.hide_from_bomb(context.cell);
+                context.stop_scan_dangerous();
+            }
+        }, this.search_dengerous_speed);
+    }
+
+    scan(way){
+        // let ctx = this;
+        // // let cell = way.cells.shift();
+        // let cell = way.cells[0];
+        // way.visit(cell);
+        // way.scan_sub_ways(cell);
+        // ctx.enter_cell(cell);
+        //
+        //     setTimeout(function () {
+        //         ctx.goWalk();
+        //     }, 3000); // TODO get bot speed from config
+        //
+        // // if (way.cells.length)
+        // //     setTimeout(function () {
+        // //         ctx.walk(way);
+        // //     }, 700); // TODO get bot speed from config
+    }
+
+
+    resetWalkStepsCount(){
+        this.walk_steps_count = Tools.random(1, 10);
+    }
+
+    changeWalkDirection(oldDirection){
+        this.walk_direction = Tools.shuffle(["left", "right", "top", "bottom"]).pop();
+
+        if (this.walk_direction == oldDirection){
+            this.changeWalkDirection(oldDirection);
+            return;
+        }
+
+        this.resetWalkStepsCount();
+    }
+
+    changeWalkDirectionLinear(oldDirection){
+        let linearDirections = {
+            "left" : "right",
+            "top" : "bottom",
+            "right" : "left",
+            "bottom" : "top"
+        }
+
+        this.walk_direction = linearDirections[ oldDirection ];
+        this.resetWalkStepsCount();
+    }
+
+    stopWalk(){
+        clearInterval(this.intervelId);
+    }
+
+    walk(){
+        this.stopWalk();
+
+        // если уже взорвался или съели
+        if (!this.cell || this.is_locked)
+            return;
+
+        let context = this;
+
+        this.changeWalkDirection();
+
+        this.intervelId = setInterval(function () {
+            // если уже взорвался или съели
+            if (!context.cell || context.is_locked)
+                return;
+
+            let around = context.cell.around;
+            let cell;
+
+            switch (context.walk_direction){
+                case "top":
+                    cell = around.top_cell;
+                    break;
+                case "left":
+                    cell = around.left_cell;
+                    break;
+                case "right":
+                    cell = around.right_cell;
+                    break;
+                case "bottom":
+                    cell = around.bottom_cell;
+                    break;
+            }
+
+            if (!cell){
+                context.changeWalkDirection(context.walk_direction);
+                return;
+            }
+
+            if (cell.isEnterableForBot(context.cell.will_exployed)){
+                context.enter_cell(cell);
+
+                /*
+                *
+                * */
+                let ways = new BotWalkWaysCollection(context);
+                ways = ways.scan_ways(cell, context);
+                let best_way = ways.get_best_way();
+                console.log('best_way', cell.$el[0], best_way);
+
+                if (best_way){
+                    context.stopWalk();
+                    context.walk_way_and_place_bomb(best_way);
+                    return;
+                }
+
+                // context.cell.is_monster = false;
+                //
+                // cell.is_monster = true;
+                // cell.monster = context;
+                // cell.enterMonster(context);
+
+                // context.cell.render();
+                // context.cell = cell;
+
+                // cell.render();
+
+                context.walk_steps_count--;
+                if (!context.walk_steps_count){
+                    // context.changeWalkDirection(context.walk_direction);
+
+                    // TODO place bomb then end of random walk way ???
+                    // context.stopWalk();
+                    // context.place_bomb(function () {
+                    //     context.walk();
+                    // });
+                    // console.log("place bomb while run...now run!");
+                    // // context.walk();
+                    // context.hide_from_bomb(cell);
+                }
+            } else {
+                context.changeWalkDirection(context.walk_direction);
+            }
+
+        }, this.walk_speed);
+    }
+
+    walk_way_and_place_bomb(way){
+        let context = this;
+        let way_cells = way.cells;
+
+        // bot already exployed
+        if (!context.cell)
+            return;
+
+        let around = context.cell.around;
+        let cell = way_cells.shift();
+        // let cell = way.cells.pop(); // ?
+
+        if (cell.isEnterableForBot(context.cell.will_exployed)){
+           context.enter_cell(cell);
+        } else {
+            context.stopWalk();
+
+            // TODO go walk after timeout?
+            // context.walk();
+
+            return;
+
+        }
+
+        if (way_cells.length){
+            this.intervelId = setTimeout(function () {
+                context.walk_way_and_place_bomb(way);
+            }, this.walk_speed);
+        } else {
+            // detect best action
+            // place bomb
+            this.place_bomb(function () {
+                console.log("bomb exployed, lets go!");
+
+                // TODO check can walk, still alive
+                // context.walk();
+            });
+            console.log("place bomb...now run!");
+               // context.walk();
+            context.stopWalk();
+
+            setTimeout(function () {
+                context.hide_from_bomb(cell);
+            }, 150);
+        }
+    }
+
+    walk_way_and_turn(way){
+        let context = this;
+        let way_cells = way.cells;
+
+        if (!way_cells.length){
+            console.log("the way is end - can't turn");
+            this.walk();
+            return;
+        }
+
+        if (!context.cell){
+            console.log("context.cell is not exists - can't continue to turn. possible bot exployed?");
+            context.stopWalk();
+            return;
+        }
+
+        let around = context.cell.around;
+        let cell = way_cells.shift();
+        // let cell = way.cells.pop(); // ?
+
+        if (!cell){
+            console.log("the cell is null - can't turn");
+            this.walk();
+            return;
+        }
+
+        if (cell.isEnterableForBot(context.cell.will_exployed)){
+            context.enter_cell(cell);
+        } else {
+            context.stopWalk();
+            // this.hide_from_bomb(this.cell);
+
+            // lets wait some
+            let wait_ms = 1000;
+            // debugger
+            console.log("cant enter to cell while go to turn - now wait " + wait_ms );
+            setTimeout(function () {
+                console.log("cant enter to cell while go to turn - now walk");
+                // context.hide_from_bomb(context.cell);
+                // context.walk();
+            }, wait_ms);
+        }
+
+        if (way_cells.length){
+            this.intervelId = setTimeout(function () {
+                context.walk_way_and_turn(way);
+            }, this.walk_speed);
+        } else {
+            // // detect best action
+            // // place bomb
+            // this.place_bomb(function () {
+            //     // context.walk();
+            // });
+            // this.turn(way.direction);
+            console.log("now turn");
+            context.start_scan_dangerous();
+            context.walk();
+            // this.hide_from_bomb(cell);
+        }
+    }
+
+    // turn(old_direction){
+    //
+    // }
+
+    check_is_dangerous_around(cell){
+        return false;
+    }
+
+    hide_from_bomb(cell){
+        let ways = new BotWalkWaysCollection(this);
+        ways = ways.scan_ways(cell, this);
+        console.log('search for way to turn from cell ', cell.$el[0]);
+        let way = ways.get_shortest_way_to_turn();
+
+        if (!way){
+            console.log("can't turn find way to turn after place bomb - lets walk");
+            // this.walk();
+            return;
+        }
+
+        this.walk_way_and_turn(way);
+        // let best_way = ways.get_best_way();
+        // console.log('best_way', cell.$el[0], best_way);
+    }
+}
+
+class BotWalkWaysCollection {
+    constructor(bot) {
+        this.ways = [];
+        this.bot = bot;
+    }
+
+    add_way(way){
+        this.ways.push(way);
+    }
+
+    get_best_way(){
+        let ranks = [];
+        let best_rank = 0;
+        let best_way = null;
+
+        for (let way of this.ways){
+            let rank = way.get_rank();
+
+            if (rank > best_rank){
+                best_rank = rank;
+                best_way = way;
+            }
+        }
+
+        console.log('best_way', best_way);
+        return best_way;
+    }
+
+    get_shortest_way_to_turn(){
+        let ranks = [];
+        let best_rank = 0;
+        let best_way = null;
+        let rank = -999;
+
+        // debugger
+        for (let way of this.ways){
+            // if (way.is_bomb_on_way()){
+            //     // debugger
+            //     continue;
+            // }
+
+            rank = way.get_steps_to_turn();
+
+            if (!rank)
+                continue;
+
+            if (rank > best_rank){
+                best_rank = rank;
+                best_way = way;
+            }
+        }
+
+        if (best_rank){
+            // best_way.cells = best_way.cells.slice(0, best_rank);
+        } else {
+            // TODO ?
+        }
+
+        console.log('shortest_way_to_turn', best_rank, best_way);
+        return best_way;
+    }
+
+
+    scan_ways(cell, bot){
+        let ways = new BotWalkWaysCollection(bot);
+
+        // 1 - top, 2- right, - 3 bottom, 4 - left
+        let directions = ["top_cell", "right_cell", "bottom_cell", "left_cell"];
+
+        for (let direction of directions){
+            let way_first_cell = cell.around[ direction ];
+
+            if (!way_first_cell)
+                continue;
+
+            let way = this.scan_way(way_first_cell, direction);
+            ways.add_way( way );
+        }
+
+        console.log('ways', ways);
+        return ways;
+    }
+
+    scan_way(way_first_cell, direction){
+        // debugger
+        let way = new BotWalkWay(direction, this.bot);
+
+        // debugger
+        if (!way_first_cell.isEnterableForBot(this.bot.cell.will_exployed))
+            return way;
+
+        way.cells.push(way_first_cell);
+
+        while (true){
+            let way_next_cell = way_first_cell.around[ direction ];
+            way_first_cell = way_next_cell;
+
+            if (!way_next_cell)
+                break;
+
+            if (!way_next_cell.isEnterableForBot(this.bot.cell.will_exployed))
+                break;
+
+            way.cells.push(way_next_cell);
+        }
+
+        return way;
+    }
+
+    get_all_ways_cells(){
+        let result = [];
+
+        for (let way of this.ways){
+            result.splice(0,0, way.cells);
+        }
+
+        console.log('get_all_ways_cells', get_all_ways_cells);
+        return result;
+    }
+
+    is_bomb_on_ways(){
+        let result = false;
+
+        for (let way of this.ways){
+            if (way.is_bomb_on_way()){
+                result = true;
+                // debugger
+                break;
+            }
+        }
+
+        return result;
+    }
+}
+
+class BotWalkWay {
+    constructor(direction, bot) {
+        this.direction = direction;
+        this.cells = [];
+        this.is_bomb = false;
+        this.is_hero = false;
+        this.is_monster = false;
+        this.is_improver = false;
+
+        this.visited_cells = [];
+        this.sub_ways = [];
+        this.bot = bot;
+    }
+
+    visit(cell) {
+        this.visited_cells.push(cell);
+    }
+
+    scan_sub_ways(cell) {
+        let ways = new BotWalkWaysCollection(this.bot);
+        ways = ways.scan_ways(cell, this.bot);
+
+        this.sub_ways = ways;
+    }
+
+    get_rank(){
+        if (!this.cells.length)
+            return -1000;
+
+        let rank = 0;
+
+        // rank -= this.cells.length;
+
+        // if (this.is_target_cell(this.cells[ this.cells.length - 1 ]))
+        //     rank += 2;
+
+        let end_path_cell = this.cells[ this.cells.length - 1 ];
+        rank += this.is_earth_around(end_path_cell);
+        rank += this.is_hero_around(end_path_cell);
+        rank += this.is_door_around(end_path_cell);
+        rank += this.is_improver_on_way();
+        // rank += this.is_improver_around(end_path_cell);
+
+        // for (let cell of this.cells){
+        //
+        // }
+
+        // let get_all_ways_cells()
+
+        return rank;
+    }
+
+    get_steps_to_turn(){
+        if (!this.cells.length)
+            return 0;
+
+        let result = 0;
+        let counter = 0;
+        let turn_cell = null;
+// debugger
+        for (let cell of this.cells){
+            counter++;
+
+            if (this.is_horizontal_way()){
+                if ( cell.around.top_cell && cell.around.top_cell.isEnterableForBot(this.bot.cell.will_exployed)){
+                    turn_cell = cell.around.top_cell;
+                    break;
+                }
+                else if (cell.around.bottom_cell && cell.around.bottom_cell.isEnterableForBot(this.bot.cell.will_exployed)){
+                    turn_cell = cell.around.bottom_cell;
+                    break;
+                }
+            } else {
+                if ( cell.around.left_cell && cell.around.left_cell.isEnterableForBot(this.bot.cell.will_exployed)){
+                    turn_cell = cell.around.left_cell;
+                    break;
+                }
+                else if ( cell.around.right_cell && cell.around.right_cell.isEnterableForBot(this.bot.cell.will_exployed)){
+                    turn_cell = cell.around.right_cell;
+                    break;
+                }
+            }
+        }
+
+        if (counter){
+            this.cells = this.cells.slice(0, counter);
+            this.cells.push(turn_cell);
+
+            result = counter + 1;
+        }
+
+        return result;
+    }
+
+    is_horizontal_way(){
+        return this.direction == "left_cell" || this.direction == "right_cell";
+    }
+
+    is_vertical_way(){
+        return this.direction == "top_cell" || this.direction == "bottom_cell";
+    }
+
+    is_earth_around(cell){
+        let aroundCells = cell.around.getLinearAroundCells(1);
+        let result = 0;
+
+        for (let cell of aroundCells){
+            if (cell.is_earth){
+                result += 1;
+
+                console.log('found is_earth_around', cell.$el[0]);
+            }
+        }
+
+        return result;
+    }
+
+    is_hero_around(current_cell){
+        let aroundCells = current_cell.around.getLinearAroundCells(1);
+        let result = 0;
+
+        for (let cell of aroundCells){
+            if (cell.is_hero && cell.hero !== this.bot){
+                result += 4;
+
+                console.log('found is_hero_around', cell.$el[0]);
+            }
+        }
+
+        return result;
+    }
+
+    is_door_around(current_cell){
+        let aroundCells = current_cell.around.getLinearAroundCells(1);
+        let result = 0;
+
+        for (let cell of aroundCells){
+            if (cell.is_contain_exit_door && !cell.is_earth){
+                result += 1;
+
+                console.log('found is_door_around', cell.$el[0]);
+            }
+        }
+
+        return result;
+    }
+
+    is_improver_on_way(){
+        // let aroundCells = current_cell.around.getLinearAroundCells(1);
+        let result = 0;
+
+        for (let cell of this.cells){
+            if (cell.improver){
+                result += 5;
+
+                console.log('found improver on way', cell.$el[0]);
+            }
+        }
+
+        return result;
+    }
+
+    is_bomb_on_way(){
+        let result = false;
+
+        // debugger
+        for (let current_cell of this.cells){
+            let aroundCells = current_cell.around.getLinearAroundCells(1);
+
+            for (let cell of aroundCells){
+                if (cell.is_bomb){
+                    result = true;
+                    break;
+                }
+            }
+
+        }
+
+        return result;
     }
 }
 
@@ -520,6 +1300,9 @@ class Cell {
         this.monster = null;
 
         this.improver = null;
+
+        this.bot = null;
+        this.will_exployed = false;
     }
 
     clean(){
@@ -596,7 +1379,14 @@ class Cell {
     }
 
     isEnterableForMonster(){
-        return !(this.is_wall || this.is_earth || this.is_bomb || this.is_monster);
+        return !(this.is_wall || this.is_earth || this.is_bomb || this.is_monster || (this.is_hero && this.hero === this.game.bot));
+    }
+
+    isEnterableForBot(is_current_cell_will_exployed){
+        return !(
+            this.is_wall || this.is_earth || this.is_bomb || this.is_monster || this.is_exployed || this.is_hero || (this.is_contain_exit_door && !this.is_earth)
+            || (!is_current_cell_will_exployed && this.will_exployed)
+        );
     }
 
     isEmptyCell(){
@@ -620,12 +1410,24 @@ class Cell {
         this.is_bomb = false;
 
         if (this.is_hero){
-            this.hero.lifes_count--;
+            this.hero.spandLife();
 
             if (!this.hero.lifes_count){
                 this.hero.is_exployed = true;
-                this.game.endGame(false);
+
+                if (this.hero instanceof Bot ){
+                    console.log("bot has exployed")
+
+                    this.hero.stopWalk();
+                    this.hero.is_locked = true;
+                    this.hero.cell = null;
+                    this.is_hero = false;
+                    this.game.bot = null;
+                } else { // instanceof Hero
+                    this.game.endGame(false);
+                }
             }
+
         }
 
         this.render();
@@ -639,6 +1441,9 @@ class Cell {
 
         // allow next near placed bomb to explode next linear earth cell
         this.is_earth = false;
+        this.game.checkTimeToOpenExitDoor();
+
+        this.will_exployed = false;
 
         let context = this;
         setTimeout(function () {
@@ -664,7 +1469,7 @@ class Cell {
         }
 
         if (this.is_monster){
-            this.hero.lifes_count--;
+            this.hero.spandLife();
 
             if (!this.hero.lifes_count){
                 this.hero.is_exployed = true;
@@ -673,7 +1478,7 @@ class Cell {
         }
 
         if (this.is_exployed){
-            this.hero.lifes_count--;
+            this.hero.spandLife();
 
             if (!this.hero.lifes_count){
                 this.hero.is_exployed = true;
@@ -699,7 +1504,7 @@ class Cell {
         }
 
         if (this.is_hero){
-            this.hero.lifes_count--;
+            this.hero.spandLife();
 
             if (!this.hero.lifes_count){
                 this.hero.is_exployed = true;
@@ -729,6 +1534,7 @@ class BomberGame {
         this.initCells($cells);
         this.initWalls();
         this.initHero();
+        this.initBots();
         this.initMonsters(this.basic_monster_count);
         this.initEarth();
         this.initExitDoor();
@@ -738,7 +1544,7 @@ class BomberGame {
     }
 
     checkTimeToOpenExitDoor(){
-        if (!this.exit_door.is_earth && !this.alive_monster_count){
+        if (!this.exit_door.is_earth && !this.alive_monster_count && !this.bot){
             this.exit_door.is_exit_door_open = true;
             this.exit_door.render();
         }
@@ -780,6 +1586,30 @@ class BomberGame {
         heroCell.hero = this.hero;
     }
 
+    initBots(){
+        // TODO spawn many bots in different corners
+        if (!this.game_level.bots_count)
+            return;
+
+        let heroCell = Tools.get_corner_cell(this.cells, this.game_level.field_size, 4);
+        console.log('heroCell', heroCell);
+
+        let bot  = new Bot(heroCell);
+        this.bot = bot;
+        bot.explode_power = this.game_level.hero_explode_power;
+        bot.bomb_count = this.game_level.hero_bombs_count;
+        // bot.safe_zone = Tools.sub_matrix(this.cells, this.game_field_size, -3, 0); // TODO
+        // console.log('this.hero.safe_zone', this.hero.safe_zone);
+
+        heroCell.is_hero = true;
+        heroCell.hero = bot;
+
+        // wait some tim
+        setTimeout(function () {
+            bot.goWalk();
+        }, 1000);
+    }
+
     initWalls(){
         let wallsSubMatrixSize = this.game_field_size - 2;
         let sub_matrix = Tools.sub_matrix(this.cells, this.game_field_size, wallsSubMatrixSize, 1);
@@ -812,6 +1642,9 @@ class BomberGame {
             }
 
             if (!cell.isEmptyCell())
+                continue;
+
+            if (this.bot && this.bot.isLinearCell(cell))
                 continue;
 
             if (this.hero.isLinearCell(cell))
@@ -878,6 +1711,9 @@ class BomberGame {
                 continue;
 
             if (this.hero.isSafeZoneCell(cell))
+                continue;
+
+            if (this.bot && this.bot.isLinearCell(cell))
                 continue;
 
             let newMonster = new Monster(this, cell);
@@ -964,6 +1800,9 @@ class BomberGame {
 
         this.stopMonsters()
         this.lockHero()
+
+        if (this.bot)
+            this.bot.stopWalk();
     }
 
     stopMonsters(){
