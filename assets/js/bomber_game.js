@@ -842,7 +842,12 @@ class Bot extends Hero{
            context.enter_cell(cell);
         } else {
             context.stopWalk();
+
+            // TODO go walk after timeout?
             // context.walk();
+
+            return;
+
         }
 
         if (way_cells.length){
