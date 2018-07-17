@@ -1403,6 +1403,7 @@ class Cell {
                     this.hero.is_locked = true;
                     this.hero.cell = null;
                     this.is_hero = false;
+                    this.game.bot = null;
                 } else { // instanceof Hero
                     this.game.endGame(false);
                 }
@@ -1421,6 +1422,7 @@ class Cell {
 
         // allow next near placed bomb to explode next linear earth cell
         this.is_earth = false;
+        this.game.checkTimeToOpenExitDoor();
 
         this.will_exployed = false;
 
@@ -1523,7 +1525,7 @@ class BomberGame {
     }
 
     checkTimeToOpenExitDoor(){
-        if (!this.exit_door.is_earth && !this.alive_monster_count){
+        if (!this.exit_door.is_earth && !this.alive_monster_count && !this.bot){
             this.exit_door.is_exit_door_open = true;
             this.exit_door.render();
         }
