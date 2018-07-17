@@ -156,6 +156,24 @@
     left: auto;
 }
 
+
+.bomber_game .cell.hero_and_bot i {
+    font-size: 20px;
+    width: 50%;
+}
+/*
+TODO depend on special <i> class like "hero" and "bot", not colors
+*/
+.bomber_game .cell.hero_and_bot i.green {
+    left: 1%;
+}
+
+.bomber_game .cell.hero_and_bot i.blue {
+    font-size: 20px;
+    right: 0%;
+    left: auto;
+}
+
 .bomber_mobile_gamepad{
     position: fixed;
     width: 100%;

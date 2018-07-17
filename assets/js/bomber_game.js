@@ -1249,6 +1249,10 @@ class Cell {
             this.bomb.render();
         }
 
+        if (this.is_hero && this.game.bot && this.game.bot.cell === this.game.hero.cell ){
+            this.$el.addClass("hero_and_bot");
+        }
+
         if (this.is_hero){
             this.hero.render();
 
@@ -1256,6 +1260,11 @@ class Cell {
                 this.hero.animateEnterToDoor();
 
         }
+
+        if (this.game.bot && this.game.bot.cell === this.game.hero.cell ){
+            this.game.bot.render();
+        }
+
 
         if (this.is_monster){
             this.monster.render();
