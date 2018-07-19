@@ -249,7 +249,7 @@ class Bomb {
 
     mark_exployed_cells(){
         this.cell.will_exployed = true;
-        console.log("cell will exployed", this.cell.$el[0]);
+        // console.log("cell will exployed", this.cell.$el[0]);
 
         let linearCells = this.cell.around.getLinearAroundCells(this.power);
 
@@ -258,7 +258,7 @@ class Bomb {
                 continue;
 
             cell.will_exployed = true;
-            console.log("cell will exployed", cell.$el[0]);
+            // console.log("cell will exployed", cell.$el[0]);
         }
     }
 }
@@ -601,10 +601,10 @@ class Bot extends Hero{
                 return;
             }
 
-            console.log("scan for dangerous...");
+            // console.log("scan for dangerous...");
 
             if (context.cell.will_exployed){
-                console.log("ALARM - found bomb around!");
+                // console.log("ALARM - found bomb around!");
                 context.hide_from_bomb(context.cell);
                 context.stop_scan_dangerous();
             }
@@ -711,7 +711,7 @@ class Bot extends Hero{
                 let ways = new BotWalkWaysCollection(context);
                 ways = ways.scan_ways(cell, context);
                 let best_way = ways.get_best_way();
-                console.log('best_way', cell.$el[0], best_way);
+                // console.log('best_way', cell.$el[0], best_way);
 
                 if (best_way){
                     context.stopWalk();
@@ -782,12 +782,12 @@ class Bot extends Hero{
             // detect best action
             // place bomb
             this.place_bomb(function () {
-                console.log("bomb exployed, lets go!");
+                // console.log("bomb exployed, lets go!");
 
                 // TODO check can walk, still alive
                 // context.walk();
             });
-            console.log("place bomb...now run!");
+            // console.log("place bomb...now run!");
                // context.walk();
             context.stopWalk();
 
@@ -851,7 +851,6 @@ class Bot extends Hero{
             //     // context.walk();
             // });
             // this.turn(way.direction);
-            console.log("now turn");
             context.start_scan_dangerous();
             context.walk();
             // this.hide_from_bomb(cell);
@@ -869,7 +868,7 @@ class Bot extends Hero{
     hide_from_bomb(cell){
         let ways = new BotWalkWaysCollection(this);
         ways = ways.scan_ways(cell, this);
-        console.log('search for way to turn from cell ', cell.$el[0]);
+        // console.log('search for way to turn from cell ', cell.$el[0]);
         let way = ways.get_shortest_way_to_turn();
 
         if (!way){
@@ -908,7 +907,7 @@ class BotWalkWaysCollection {
             }
         }
 
-        console.log('best_way', best_way);
+        // console.log('best_way', best_way);
         return best_way;
     }
 
@@ -942,7 +941,7 @@ class BotWalkWaysCollection {
             // TODO ?
         }
 
-        console.log('shortest_way_to_turn', best_rank, best_way);
+        // console.log('shortest_way_to_turn', best_rank, best_way);
         return best_way;
     }
 
@@ -963,7 +962,7 @@ class BotWalkWaysCollection {
             ways.add_way( way );
         }
 
-        console.log('ways', ways);
+        // console.log('ways', ways);
         return ways;
     }
 
@@ -1000,7 +999,7 @@ class BotWalkWaysCollection {
             result.splice(0,0, way.cells);
         }
 
-        console.log('get_all_ways_cells', get_all_ways_cells);
+        // console.log('get_all_ways_cells', get_all_ways_cells);
         return result;
     }
 
@@ -1129,7 +1128,7 @@ class BotWalkWay {
             if (cell.is_earth){
                 result += 1;
 
-                console.log('found is_earth_around', cell.$el[0]);
+                // console.log('found is_earth_around', cell.$el[0]);
             }
         }
 
@@ -1144,7 +1143,7 @@ class BotWalkWay {
             if (cell.is_hero && cell.hero !== this.bot){
                 result += 4;
 
-                console.log('found is_hero_around', cell.$el[0]);
+                // console.log('found is_hero_around', cell.$el[0]);
             }
         }
 
@@ -1159,7 +1158,7 @@ class BotWalkWay {
             if (cell.is_contain_exit_door && !cell.is_earth){
                 result += 1;
 
-                console.log('found is_door_around', cell.$el[0]);
+                // console.log('found is_door_around', cell.$el[0]);
             }
         }
 
@@ -1174,7 +1173,7 @@ class BotWalkWay {
             if (cell.improver){
                 result += 5;
 
-                console.log('found improver on way', cell.$el[0]);
+                // console.log('found improver on way', cell.$el[0]);
             }
         }
 
@@ -1526,7 +1525,7 @@ class BomberGame {
             return;
 
         let heroCell = Tools.get_corner_cell(this.cells, this.game_level.field_size, 4);
-        console.log('heroCell', heroCell);
+        // console.log('heroCell', heroCell);
 
         let bot  = new Bot(heroCell);
         this.bot = bot;
