@@ -609,9 +609,7 @@ class Bot extends Hero{
 
             if (context.cell.will_exployed){
                 console.log("ALARM - found bomb around!");
-                context.stopWalk();
                 context.hide_from_bomb(context.cell);
-                // context.stop_scan_dangerous();
             }
         }, this.search_dengerous_speed);
     }
@@ -861,7 +859,7 @@ class Bot extends Hero{
             // });
             // this.turn(way.direction);
             // context.start_scan_dangerous();
-            context.walk();
+            context.goWalk();
             // this.hide_from_bomb(cell);
         }
     }
@@ -880,8 +878,12 @@ class Bot extends Hero{
         // console.log('search for way to turn from cell ', cell.$el[0]);
         let way = ways.get_shortest_way_to_turn();
 
+        this.stop_scan_dangerous();
+        this.stopWalk();
+
         if (!way){
             console.log("can't turn find way to turn after place bomb - lets walk");
+            this.goWalk();
             // this.walk();
             return;
         }
