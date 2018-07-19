@@ -8,7 +8,10 @@
  */
 
 class BomberGameLevel {
-    constructor(field_size, monsters_count, hero_bombs_count, hero_explode_power, improver_bombs_count, improver_power_count, lifes_power_count, bots_count) {
+    constructor(field_size, monsters_count, hero_bombs_count, hero_explode_power, 
+                improver_bombs_count, improver_power_count, lifes_power_count, bots_count,
+                bot_walk_speed_delay_ms
+    ) {
         this.field_size = field_size;
         this.monsters_count = monsters_count;
         this.hero_bombs_count = hero_bombs_count;
@@ -17,6 +20,7 @@ class BomberGameLevel {
         this.improver_power_count = improver_power_count;
         this.lifes_power_count = lifes_power_count;
         this.bots_count = bots_count;
+        this.bot_walk_speed = bot_walk_speed_delay_ms;
     }
 }
 
@@ -559,7 +563,7 @@ class Bot extends Hero{
         this.intervelId_dangerous = 0;
         this.walk_direction = "none";
         this.walk_steps_count = 1;
-        this.walk_speed = 250; // TODO get from config
+        this.walk_speed = 0; // gets from config
         this.search_dengerous_speed = 200 * 1; // TODO get from config
     }
     render_getColor(){
@@ -1536,6 +1540,7 @@ class BomberGame {
         this.bot = bot;
         bot.explode_power = this.game_level.hero_explode_power;
         bot.bomb_count = this.game_level.hero_bombs_count;
+        bot.walk_speed = this.game_level.bot_walk_speed;
         // bot.safe_zone = Tools.sub_matrix(this.cells, this.game_field_size, -3, 0); // TODO
         // console.log('this.hero.safe_zone', this.hero.safe_zone);
 

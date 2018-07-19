@@ -26,13 +26,13 @@ let BomberApp = new Vue({
             field_size : 0
         },
         levels : [
-            // new BomberGameLevel(6, 3, 1, 1, 3, 3, 4, 1), // TODO remove debug level
-            new BomberGameLevel(5, 5, 1, 1, 1, 0, 0),
-            new BomberGameLevel(7, 7, 2, 1, 0, 1, 1, 0),
-            new BomberGameLevel(9, 9, 2, 1, 2, 1, 1, 1),
-            new BomberGameLevel(11, 11, 2, 2, 2, 1, 2, 1),
-            new BomberGameLevel(13, 13, 2, 2, 3, 2, 3, 2),
-            new BomberGameLevel(15, 15, 5, 5, 5, 5, 5, 3),
+            // new BomberGameLevel(6, 0, 1, 1, 3, 3, 4, 1), // TODO remove debug level
+            new BomberGameLevel(5, 5, 1, 1, 1, 0, 0, 0),
+            new BomberGameLevel(7, 7, 2, 1, 0, 1, 1, 0, 0),
+            new BomberGameLevel(9, 1, 2, 1, 2, 1, 1, 1, 600),
+            new BomberGameLevel(11, 11, 2, 2, 2, 1, 2, 1, 500),
+            new BomberGameLevel(13, 13, 2, 2, 3, 2, 3, 2, 400),
+            new BomberGameLevel(15, 15, 5, 5, 5, 5, 5, 3, 350),
         ],
         bomber_game : null,
 
