@@ -1253,9 +1253,9 @@ class Cell {
             this.bomb.render();
         }
 
-        if (this.is_hero && this.game.bot && this.game.bot.cell === this.game.hero.cell ){
-            this.$el.addClass("hero_and_bot");
-        }
+        // if (this.is_hero && this.game.bot && this.game.bot.cell === this.game.hero.cell ){
+        //     this.$el.addClass("hero_and_bot");
+        // }
 
         if (this.is_hero){
             this.hero.render();
@@ -1265,9 +1265,9 @@ class Cell {
 
         }
 
-        if (this.game.bot && this.game.bot.cell === this.game.hero.cell ){
-            this.game.bot.render();
-        }
+        // if (this.game.bot && this.game.bot.cell === this.game.hero.cell ){
+        //     this.game.bot.render();
+        // }
 
 
         if (this.is_monster){
@@ -1296,7 +1296,7 @@ class Cell {
     }
 
     isEnterableCell(){
-        return !(this.is_wall || this.is_earth || this.is_bomb);
+        return !(this.is_wall || this.is_earth || this.is_bomb || this.is_hero);
     }
 
     isEnterableForMonster(){
@@ -1307,6 +1307,7 @@ class Cell {
         return !(
             this.is_wall || this.is_earth || this.is_bomb || this.is_monster || this.is_exployed || this.is_hero || (this.is_contain_exit_door && !this.is_earth)
             || (!is_current_cell_will_exployed && this.will_exployed)
+            || this.is_hero
         );
     }
 
