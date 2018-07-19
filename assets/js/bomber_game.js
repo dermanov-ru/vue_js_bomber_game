@@ -230,6 +230,10 @@ class Bomb {
         }, 200 * this.timeout_seconds)
     }
 
+    stopTimer(){
+        clearInterval(this.intervelId);
+    }
+
     explode(){
         this.cell.explode();
 
@@ -518,6 +522,9 @@ class Hero {
 
         let bomb = new Bomb(this.cell, this.explode_power);
         this.cell.is_bomb = true;
+
+        this.cell.game.bombs.push(bomb);
+
         this.cell.bomb = bomb;
         this.cell.render();
 
@@ -1450,6 +1457,9 @@ class BomberGame {
         this.monsters = [];
 
         this.on_game_end_callback = null;
+
+        // for stop explode timer on game end
+        this.bombs = [];
     }
 
     initGame($cells){
@@ -1479,6 +1489,7 @@ class BomberGame {
     destroy(){
         this.stopMonsters();
         this.stopBots();
+        this.stopBombTimers();
     }
 
     // --- privat ---
@@ -1724,6 +1735,7 @@ class BomberGame {
         this.stopMonsters()
         this.lockHero()
         this.stopBots();
+        this.stopBombTimers();
     }
 
     stopMonsters(){
@@ -1732,6 +1744,12 @@ class BomberGame {
                 continue;
 
             cell.monster.stopWalk();
+        }
+    }
+
+    stopBombTimers(){
+        for (let bomb of this.bombs){
+            bomb.stopTimer();
         }
     }
 
