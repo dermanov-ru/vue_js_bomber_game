@@ -596,7 +596,7 @@ class Bot extends Hero{
         this.intervelId_dangerous = setInterval(function () {
             // если уже взорвался или съели
             if (!context.cell || context.is_locked){
-                console.log("STOP scan for dangerous.");
+                console.log("STOP scan for dangerous - context not exist more");
                 context.stop_scan_dangerous();
                 return;
             }
@@ -604,9 +604,10 @@ class Bot extends Hero{
             // console.log("scan for dangerous...");
 
             if (context.cell.will_exployed){
-                // console.log("ALARM - found bomb around!");
+                console.log("ALARM - found bomb around!");
+                context.stopWalk();
                 context.hide_from_bomb(context.cell);
-                context.stop_scan_dangerous();
+                // context.stop_scan_dangerous();
             }
         }, this.search_dengerous_speed);
     }
@@ -826,18 +827,22 @@ class Bot extends Hero{
         if (cell.isEnterableForBot(context.cell.will_exployed)){
             context.enter_cell(cell);
         } else {
+            console.log("cant enter to cell while go to turn - lets just walk random");
             context.stopWalk();
+            context.hide_from_bomb(context.cell);
+
             // this.hide_from_bomb(this.cell);
 
-            // lets wait some
-            let wait_ms = 1000;
-            // debugger
-            console.log("cant enter to cell while go to turn - now wait " + wait_ms );
-            setTimeout(function () {
-                console.log("cant enter to cell while go to turn - now walk");
-                // context.hide_from_bomb(context.cell);
-                // context.walk();
-            }, wait_ms);
+            // // lets wait some
+            // let wait_ms = 150;
+            // // debugger
+            // console.log("cant enter to cell while go to turn - now wait " + wait_ms );
+            // setTimeout(function () {
+            //     console.log("cant enter to cell while go to turn - now walk");
+            //     console.log("cant enter to cell while go to turn - now walk");
+            //     // context.hide_from_bomb(context.cell);
+            //     // context.walk();
+            // }, wait_ms);
         }
 
         if (way_cells.length){
@@ -851,7 +856,7 @@ class Bot extends Hero{
             //     // context.walk();
             // });
             // this.turn(way.direction);
-            context.start_scan_dangerous();
+            // context.start_scan_dangerous();
             context.walk();
             // this.hide_from_bomb(cell);
         }
