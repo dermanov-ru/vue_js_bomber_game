@@ -1473,6 +1473,7 @@ class BomberGame {
 
     destroy(){
         this.stopMonsters();
+        this.stopBots();
     }
 
     // --- privat ---
@@ -1717,9 +1718,7 @@ class BomberGame {
 
         this.stopMonsters()
         this.lockHero()
-
-        if (this.bot)
-            this.bot.stopWalk();
+        this.stopBots();
     }
 
     stopMonsters(){
@@ -1733,5 +1732,12 @@ class BomberGame {
 
     lockHero(){
         this.hero.is_locked = true;
+    }
+
+    stopBots(){
+        if (this.bot){
+            this.bot.stopWalk();
+            this.bot.stop_scan_dangerous();
+        }
     }
 }
