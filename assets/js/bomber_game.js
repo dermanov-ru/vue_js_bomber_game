@@ -546,7 +546,9 @@ class Bot extends Hero{
 
         // this.game = game;
         // this.cell = cell;
-        this.intervelId = 0;
+        this.intervelId_walk_random = 0;
+        this.intervelId_place_bomb = 0;
+        this.intervelId_hide_from_bomb = 0;
         this.intervelId_dangerous = 0;
         this.walk_direction = "none";
         this.walk_steps_count = 1;
@@ -649,7 +651,9 @@ class Bot extends Hero{
     }
 
     stopWalk(){
-        clearInterval(this.intervelId);
+        clearInterval(this.intervelId_walk_random);
+        clearInterval(this.intervelId_place_bomb);
+        clearInterval(this.intervelId_hide_from_bomb);
     }
 
     walk(){
@@ -663,7 +667,7 @@ class Bot extends Hero{
 
         this.changeWalkDirection();
 
-        this.intervelId = setInterval(function () {
+        this.intervelId_walk_random = setInterval(function () {
             // если уже взорвался или съели
             if (!context.cell || context.is_locked)
                 return;
@@ -764,7 +768,7 @@ class Bot extends Hero{
         }
 
         if (way_cells.length){
-            this.intervelId = setTimeout(function () {
+            this.intervelId_place_bomb = setTimeout(function () {
                 context.walk_way_and_place_bomb(way);
             }, this.walk_speed);
         } else {
@@ -792,7 +796,7 @@ class Bot extends Hero{
 
         if (!way_cells.length){
             console.log("the way is end - can't turn");
-            this.walk();
+            // this.walk(); // TODO ?
             return;
         }
 
@@ -830,7 +834,7 @@ class Bot extends Hero{
         }
 
         if (way_cells.length){
-            this.intervelId = setTimeout(function () {
+            this.intervelId_hide_from_bomb = setTimeout(function () {
                 context.walk_way_and_turn(way);
             }, this.walk_speed);
         } else {
