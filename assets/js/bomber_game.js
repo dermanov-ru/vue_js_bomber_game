@@ -559,7 +559,7 @@ class Bot extends Hero{
         this.intervelId_dangerous = 0;
         this.walk_direction = "none";
         this.walk_steps_count = 1;
-        this.walk_speed = 400; // TODO get from config
+        this.walk_speed = 250; // TODO get from config
         this.search_dengerous_speed = 200 * 1; // TODO get from config
     }
     render_getColor(){
