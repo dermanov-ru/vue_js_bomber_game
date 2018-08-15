@@ -1,3 +1,16 @@
 body{
     margin: 10px 0;
 }
+
+.rules {
+    text-align: left;
+    padding: 0 20px;
+}
+
+.rules img {
+    max-width: 100%;
+}
+
+.center{
+    text-align: center;
+}
